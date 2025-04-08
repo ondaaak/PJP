@@ -2,7 +2,7 @@ import sys
 
 class Token:
     def __init__(self, kind, value):
-        self.kind = kind 
+        self.kind = kind
         self.value = value
 
 def tokenize(expression):
@@ -12,13 +12,11 @@ def tokenize(expression):
         ch = expression[i]
         if ch.isspace():
             i += 1
-            continue
         elif ch.isdigit():
             start = i
             while i < len(expression) and expression[i].isdigit():
                 i += 1
             tokens.append(Token('NUM', int(expression[start:i])))
-            continue
         elif ch in '+-*/()':
             tokens.append(Token(ch, ch))
             i += 1
@@ -31,114 +29,97 @@ class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.pos = 0
-        self.error_occurred = False
+        self.error = False
 
-    def current_token(self):
+    def current(self):
         return self.tokens[self.pos] if self.pos < len(self.tokens) else None
 
-    def consume(self, kind=None):
-        token = self.current_token()
+    def eat(self, kind=None):
+        token = self.current()
         if token and (kind is None or token.kind == kind):
             self.pos += 1
             return token
-        self.error_occurred = True
+        self.error = True
         return None
 
     def E(self):
         """ E : T E1 """
         value = self.T()
-        if value is None or self.error_occurred:
-            return None
         return self.E1(value)
 
-    def E1(self, left_value):
+    def E1(self, left):
         """ E1 : '+' T E1 | '-' T E1 | {e} """
-        token = self.current_token()
+        token = self.current()
         if token and token.kind in ['+', '-']:
             op = token.kind
-            self.consume(op)
-            right_value = self.T()
-            if right_value is None or self.error_occurred:
-                return None
-            if op == '+':
-                left_value += right_value
-            else:
-                left_value -= right_value
-            return self.E1(left_value)
-        return left_value
+            self.eat(op)
+            right = self.T()
+            if op == '+': 
+                left += right
+            else: 
+                left -= right
+            return self.E1(left)
+        return left
 
     def T(self):
         """ T : F T1 """
-        value = self.F() 
-        if value is None or self.error_occurred:
-            return None
+        value = self.F()
         return self.T1(value)
 
-    def T1(self, left_value):
+    def T1(self, left):
         """ T1 : '*' F T1 | '/' F T1 | {e} """
-        token = self.current_token()
+        token = self.current()
         if token and token.kind in ['*', '/']:
             op = token.kind
-            self.consume(op)
-            right_value = self.F() 
-            if right_value is None or self.error_occurred:
-                return None
-            if op == '*':
-                left_value *= right_value
+            self.eat(op)
+            right = self.F()
+            if op == '*': 
+                left *= right
             else:
-                if right_value == 0:
-                    self.error_occurred = True
+                if right == 0:
+                    self.error = True
                     return None
-                else:
-                    left_value //= right_value
-            return self.T1(left_value)
-        return left_value
+                left //= right
+            return self.T1(left)
+        return left
 
     def F(self):
         """ F : '(' E ')' | num """
-        token = self.current_token()
-        if not token:
-            self.error_occurred = True
-            return None
-            
+        token = self.current()
         if token.kind == '(':
-            self.consume('(')
+            self.eat('(')
             value = self.E()
-            if value is None or not self.consume(')'):
-                self.error_occurred = True
-                return None
+            self.eat(')')
             return value
-        elif token.kind == 'NUM':
+        else: 
             value = token.value
-            self.consume('NUM')
+            self.eat('NUM')
             return value
-        else:
-            self.error_occurred = True
-            return None
 
-def evaluate_expression(expr):
+def evaluate(expr):
     tokens = tokenize(expr)
     if not tokens:
         return None
+    
     parser = Parser(tokens)
-    value = parser.E()
-
-    if parser.error_occurred or parser.current_token().kind != 'EOF':
+    result = parser.E()
+    
+    if parser.error or parser.current().kind != 'EOF':
         return None
-    return value
+    
+    return result
 
 def main():
     try:
         N = int(input())
-        
         for _ in range(N):
             expr = input()
-            result = evaluate_expression(expr)
+            result = evaluate(expr)
             if result is None:
                 print("ERROR")
             else:
                 print(result)
-    except Exception:
+    except:
         print("ERROR")
 
 if __name__ == "__main__":
