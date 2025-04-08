@@ -2,11 +2,10 @@ import sys
 
 class Token:
     def __init__(self, kind, value):
-        self.kind = kind  # e.g., 'NUM', '+', '-', '*', '/', '(', ')', 'EOF'
+        self.kind = kind 
         self.value = value
 
 def tokenize(expression):
-    """ Simple tokenizer splitting on operators and digits. """
     tokens = []
     i = 0
     while i < len(expression):
@@ -24,7 +23,6 @@ def tokenize(expression):
             tokens.append(Token(ch, ch))
             i += 1
         else:
-            # Invalid character
             return None
     tokens.append(Token('EOF', None))
     return tokens
@@ -46,58 +44,57 @@ class Parser:
         self.error_occurred = True
         return None
 
-    def parse_expression(self):
+    def E(self):
         """ E : T E1 """
-        value = self.parse_term()
+        value = self.T()
         if value is None or self.error_occurred:
             return None
-        return self.parse_expression_tail(value)
+        return self.E1(value)
 
-    def parse_expression_tail(self, left_value):
+    def E1(self, left_value):
         """ E1 : '+' T E1 | '-' T E1 | {e} """
         token = self.current_token()
         if token and token.kind in ['+', '-']:
             op = token.kind
             self.consume(op)
-            right_value = self.parse_term()
+            right_value = self.T()
             if right_value is None or self.error_occurred:
                 return None
             if op == '+':
                 left_value += right_value
             else:
                 left_value -= right_value
-            return self.parse_expression_tail(left_value)
+            return self.E1(left_value)
         return left_value
 
-    def parse_term(self):
+    def T(self):
         """ T : F T1 """
-        value = self.parse_factor()
+        value = self.F() 
         if value is None or self.error_occurred:
             return None
-        return self.parse_term_tail(value)
+        return self.T1(value)
 
-    def parse_term_tail(self, left_value):
+    def T1(self, left_value):
         """ T1 : '*' F T1 | '/' F T1 | {e} """
         token = self.current_token()
         if token and token.kind in ['*', '/']:
             op = token.kind
             self.consume(op)
-            right_value = self.parse_factor()
+            right_value = self.F() 
             if right_value is None or self.error_occurred:
                 return None
             if op == '*':
                 left_value *= right_value
             else:
-                # Check for divide by zero
                 if right_value == 0:
                     self.error_occurred = True
                     return None
                 else:
                     left_value //= right_value
-            return self.parse_term_tail(left_value)
+            return self.T1(left_value)
         return left_value
 
-    def parse_factor(self):
+    def F(self):
         """ F : '(' E ')' | num """
         token = self.current_token()
         if not token:
@@ -106,7 +103,7 @@ class Parser:
             
         if token.kind == '(':
             self.consume('(')
-            value = self.parse_expression()
+            value = self.E()
             if value is None or not self.consume(')'):
                 self.error_occurred = True
                 return None
@@ -124,7 +121,7 @@ def evaluate_expression(expr):
     if not tokens:
         return None
     parser = Parser(tokens)
-    value = parser.parse_expression()
+    value = parser.E()
 
     if parser.error_occurred or parser.current_token().kind != 'EOF':
         return None
@@ -146,4 +143,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
