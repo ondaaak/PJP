@@ -1,37 +1,31 @@
 grammar Expr;
 
-/** The start rule; begin parsing here. */
-prog: stat+ ; // Seznam příkazů
+// Parser rules
+prog: command* EOF;
 
-stat: decl ';'                     # declaration
-    | expr ';'                     # expression
+command: statement;
+
+statement: expr ';'             # ExprStatement
+         | ID '=' expr ';'      # Assignment
+         ;
+
+expr: expr op=('*'|'/') expr   # MulDiv
+    | expr op=('+'|'-') expr   # AddSub
+    | INT                      # IntLiteral
+    | FLOAT                    # FloatLiteral
+    | BOOL                     # BoolLiteral
+    | STRING                   # StringLiteral
+    | ID                       # Variable
+    | '(' expr ')'             # Parens
     ;
 
-decl: type ID (',' ID)*             # variableDecl
-    ;
+// Lexer rules
+BOOL: 'true' | 'false';
+ID: [a-zA-Z][a-zA-Z0-9]*;      // Identifiers start with letter, can contain digits
+INT: [0-9]+;                   // Integer literals
+FLOAT: [0-9]+ '.' [0-9]*;      // Float literals with decimal point
+STRING: '"' ( ~["\r\n\\] | '\\' . )* '"';  // String literals with optional escape sequences
 
-type: 'int'                         # intType
-    | 'float'                       # floatType
-    | 'string'                      # stringType
-    ;
-
-expr: ID '=' expr                   # assign
-    | expr op=('*'|'/'|'%') expr    # mul
-    | expr op=('+'|'-') expr        # add
-    | INT                           # int
-    | FLOAT                         # float
-    | OCT                           # oct
-    | HEXA                          # hexa
-    | ID                            # var
-    | '(' expr ')'                  # par
-    | STRING                        # string
-    ;
-
-ID : [a-zA-Z]+ ;        // match identifiers
-INT : [1-9][0-9]* ;          // match integers
-FLOAT : [0-9]+ '.' [0-9]+ ; // match floats
-STRING: '"' ( ~["\r\n\\] | '\\' . )* '"' ; // String in double quotes with escape support
-OCT : '0'[0-7]* ;
-HEXA : '0x'[0-9a-fA-F]+ ;
-WS : [ \t\r\n]+ -> skip ;   // toss out whitespace
-ADD : '+' ;
+// Handle whitespace and comments
+WS: [ \t\r\n]+ -> skip;        // Skip whitespace
+COMMENT: '//' ~[\r\n]* -> skip;  // Skip comments (// to end of line)
