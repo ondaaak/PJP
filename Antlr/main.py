@@ -3,7 +3,7 @@ from antlr4.error.ErrorListener import ErrorListener
 from ExprLexer import ExprLexer
 from ExprParser import ExprParser
 from EvalVisitor import EvalVisitor
-# from EvalListener import EvalListener  # Odstraněno, už nepoužíváme
+
 class SyntaxErrorListener(ErrorListener):
     def __init__(self):
         super(SyntaxErrorListener, self).__init__()
@@ -14,65 +14,66 @@ class SyntaxErrorListener(ErrorListener):
         self.syntax_errors.append(error)
 
 def main():
-    #input_text = input("Enter expression or assignment: ")
     input_text = """
-// This is a comment
-// Testing variable declarations
-int intVar;             // Declaration with default value (0)
-float floatVar;         // Declaration with default value (0.0)
-bool boolVar;           // Declaration with default value (false)
-string stringVar;       // Declaration with default value ("")
+write "<Constants>";
+write "10: ",10;
+write " 1.25: ", 1.25;
+write "";;
 
-// Testing declarations with assignment
-int x = 42;             // Integer declaration with assignment
-float y = 3.14;         // Float declaration with assignment
-bool flag = true;       // Boolean declaration with assignment
-string message = "Hello, World!";  // String declaration with assignment
+write "<Variables>";
+string s;
+s="Abcd";
+write "s(Abcd): ", s;
 
-// Test expressions with declared variables
-intVar = 10;            // Assign value to declared variable
-x + intVar;             // Expression using declared variables
-y * 2;                  // Float arithmetic
+float d;
+d=3.141592;
+write "d(3.141592): ", d;
 
-// Test string operations
-string s1 = "Concatenate ";
-string s2 = "strings";
-s1 + s2;                // String concatenation
+int n;
+n=-500;
+write "n(-500): ", n;
+write "";
 
-// Test write statement
-write "The value of x is: ", x;
-write "The result of x + intVar is: ", x + intVar;
+bool boolean;
+boolean=true;
+write "boolean(true): ",boolean;
+write "";
 
-// Test if statement
-if (x > intVar) {
-    write "x is greater than intVar";
-} else {
-    write "x is not greater than intVar";
-}
+write "<Expressions>";
+write "2+3*5(17): ",2+3*5;
+write "17 / 3(5): ", 17 / 3;
+write "17 % 3(2): ", 17 % 3;
+write "2.5*2.5/6.25(1.0): ", 2.5*2.5/6.25;
+write "1.5*3(4.5): ", 1.5*3;
+write "abc+def (abcdef): ", "abc"."def";
+write "";
 
-// Test while loop - fixed version without variable increment
-int i = 0;
-while (i < 5) {
-    write "Loop iteration: ", i;
-    i = 1 + i;  // Changed order to test if that makes a difference
-}
+write  "<Comments>"; // hidden
+// write  "it is error, if you see this";
 
-// Test block statement with multiple statements
-{
-    int blockVar = 100;
-    write "Inside block, blockVar =", blockVar;
-    blockVar = blockVar * 2;
-    write "After modification, blockVar =", blockVar;
-}
+write "<Automatic int conversion>";
+float y;
+y = 10;
+write "y (10.0): ", y;
 
-// Test logical operations
-bool result = (x > 30) && (intVar < 20);
-write "Logical AND result:", result;
+write "<Multiple Assignments>";
+int i,j,k;
+i=j=k=55;
+write "i=j=k=55: ",i,"=",j,"=",k;
 
-// Test comparison operations
-write "Equality test:", x == 42;
-write "Inequality test:", y != 3.0;
+write "<Input - a(int),b(float),c(string),d(bool)>";
+int a;
+float b;
+string c;
+bool e;
+a = 0;
+b = 0.0;
+c = "";
+e = true;
+read a,b,c,e;
+write "a,b,c,e: ", a, ",", b, ",", c, ",",e;
 """
+    
     input_stream = InputStream(input_text)
     
     # Setup lexer with error handling
@@ -117,15 +118,6 @@ write "Inequality test:", y != 3.0;
     print("\nVariable values from visitor:")
     for key, value in visitor.memory.items():
         print(f"{key}: {value} (type: {visitor.types.get(key, 'unknown')})")
-
-    # Remove the listener part
-    # listener = EvalListener()
-    # walker = ParseTreeWalker()
-    # walker.walk(listener, tree)
-    #
-    # print("\nVariable values from listener:")
-    # for key, value in listener.values.items():
-    #     print(f"{key}: {value} (type: {listener.types.get(key, 'unknown')})")
 
 if __name__ == '__main__':
     main()
