@@ -3,8 +3,9 @@ from ExprParser import ExprParser
 
 class EvalVisitor(ExprVisitor):
     def __init__(self):
-        self.memory = {}  # Store variable values
-        self.types = {}   # Store variable types
+        self.memory = {}   # Store variable values
+        self.types = {}    # Store variable types
+        self.declared = set()  # Track declared variables
         self.type_errors = []
         
     def visitProg(self, ctx):
@@ -20,21 +21,96 @@ class EvalVisitor(ExprVisitor):
         
     def visitAssignment(self, ctx):
         id_name = ctx.ID().getText()
+        
+        # Check if variable is declared
+        if id_name not in self.declared:
+            self.type_errors.append(f"Variable '{id_name}' used before declaration")
+            return None
+            
         value = self.visit(ctx.expr())
         
-        if value is not None:
-            self.memory[id_name] = value
-            # Infer type based on value
-            if isinstance(value, int):
-                self.types[id_name] = 'int'
-            elif isinstance(value, float):
-                self.types[id_name] = 'float'
-            elif isinstance(value, bool):
-                self.types[id_name] = 'bool'
-            elif isinstance(value, str):
-                self.types[id_name] = 'string'
-        
+        # Type checking
+        expected_type = self.types[id_name]
+        if not self._check_type_compatibility(value, expected_type):
+            self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{id_name}' of type {expected_type}")
+            return None
+            
+        # Store value
+        self.memory[id_name] = value
         return None  # Assignment doesn't return a value
+        
+    def visitDeclaration(self, ctx):
+        id_name = ctx.ID().getText()
+        # Fix: use type_ instead of type
+        type_name = self.visit(ctx.type_())
+        
+        # Check for redeclaration
+        if id_name in self.declared:
+            self.type_errors.append(f"Variable '{id_name}' already declared")
+            return None
+            
+        # Register the variable
+        self.declared.add(id_name)
+        self.types[id_name] = type_name
+        
+        # Set default value based on type
+        if type_name == 'int':
+            self.memory[id_name] = 0
+        elif type_name == 'float':
+            self.memory[id_name] = 0.0
+        elif type_name == 'bool':
+            self.memory[id_name] = False
+        elif type_name == 'string':
+            self.memory[id_name] = ""
+            
+        return None
+        
+    def visitDeclarationWithAssignment(self, ctx):
+        id_name = ctx.ID().getText()
+        # Fix: use type_ instead of type
+        type_name = self.visit(ctx.type_())
+        
+        # Check for redeclaration
+        if id_name in self.declared:
+            self.type_errors.append(f"Variable '{id_name}' already declared")
+            return None
+            
+        # Register the variable
+        self.declared.add(id_name)
+        self.types[id_name] = type_name
+        
+        # Set value from expression
+        value = self.visit(ctx.expr())
+        
+        # Type checking
+        if not self._check_type_compatibility(value, type_name):
+            self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{id_name}' of type {type_name}")
+            # Set default value instead
+            if type_name == 'int':
+                self.memory[id_name] = 0
+            elif type_name == 'float':
+                self.memory[id_name] = 0.0
+            elif type_name == 'bool':
+                self.memory[id_name] = False
+            elif type_name == 'string':
+                self.memory[id_name] = ""
+        else:
+            # Value is compatible, store it
+            self.memory[id_name] = value
+            
+        return None
+        
+    def visitIntType(self, ctx):
+        return 'int'
+        
+    def visitFloatType(self, ctx):
+        return 'float'
+        
+    def visitBoolType(self, ctx):
+        return 'bool'
+        
+    def visitStringType(self, ctx):
+        return 'string'
         
     def visitExprStatement(self, ctx):
         return self.visit(ctx.expr())
@@ -102,10 +178,26 @@ class EvalVisitor(ExprVisitor):
         
     def visitVariable(self, ctx):
         id_name = ctx.ID().getText()
-        if id_name not in self.memory:
-            self.type_errors.append(f"Variable '{id_name}' is not defined")
+        
+        # Check if variable is declared
+        if id_name not in self.declared:
+            self.type_errors.append(f"Variable '{id_name}' used before declaration")
             return None
+            
         return self.memory[id_name]
         
     def visitParens(self, ctx):
         return self.visit(ctx.expr())
+        
+    def _check_type_compatibility(self, value, expected_type):
+        """Check if a value is compatible with the expected type."""
+        if expected_type == 'int':
+            return isinstance(value, int)
+        elif expected_type == 'float':
+            # Allow int to float conversion
+            return isinstance(value, (int, float))
+        elif expected_type == 'bool':
+            return isinstance(value, bool)
+        elif expected_type == 'string':
+            return isinstance(value, str)
+        return False

@@ -18,20 +18,27 @@ def main():
     #input_text = input("Enter expression or assignment: ")
     input_text = """
 // This is a comment
-// Testing different literal types
-intVar = 42;           // Integer literal
-floatVar = 3.14;       // Float literal
-boolVar = true;        // Boolean literal
-stringVar = "Hello, World!";  // String literal
+// Testing variable declarations
+int intVar;             // Declaration with default value (0)
+float floatVar;         // Declaration with default value (0.0)
+bool boolVar;           // Declaration with default value (false)
+string stringVar;       // Declaration with default value ("")
 
-// Test expressions
-intVar + 10;           // Integer arithmetic
-floatVar * 2;          // Float arithmetic
-"Concatenate " + "strings";  // String concatenation
+// Testing declarations with assignment
+int x = 42;             // Integer declaration with assignment
+float y = 3.14;         // Float declaration with assignment
+bool flag = true;       // Boolean declaration with assignment
+string message = "Hello, World!";  // String declaration with assignment
 
-// Test more complex expressions
-(intVar + floatVar) * 2;
-boolVar = false;
+// Test expressions with declared variables
+intVar = 10;            // Assign value to declared variable
+x + intVar;             // Expression using declared variables
+y * 2;                  // Float arithmetic
+
+// Test string operations
+string s1 = "Concatenate ";
+string s2 = "strings";
+s1 + s2;                // String concatenation
 """
     input_stream = InputStream(input_text)
     

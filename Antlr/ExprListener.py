@@ -44,6 +44,60 @@ class ExprListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ExprParser#Declaration.
+    def enterDeclaration(self, ctx:ExprParser.DeclarationContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#Declaration.
+    def exitDeclaration(self, ctx:ExprParser.DeclarationContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#DeclarationWithAssignment.
+    def enterDeclarationWithAssignment(self, ctx:ExprParser.DeclarationWithAssignmentContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#DeclarationWithAssignment.
+    def exitDeclarationWithAssignment(self, ctx:ExprParser.DeclarationWithAssignmentContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#IntType.
+    def enterIntType(self, ctx:ExprParser.IntTypeContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#IntType.
+    def exitIntType(self, ctx:ExprParser.IntTypeContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#FloatType.
+    def enterFloatType(self, ctx:ExprParser.FloatTypeContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#FloatType.
+    def exitFloatType(self, ctx:ExprParser.FloatTypeContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#BoolType.
+    def enterBoolType(self, ctx:ExprParser.BoolTypeContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#BoolType.
+    def exitBoolType(self, ctx:ExprParser.BoolTypeContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#StringType.
+    def enterStringType(self, ctx:ExprParser.StringTypeContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#StringType.
+    def exitStringType(self, ctx:ExprParser.StringTypeContext):
+        pass
+
+
     # Enter a parse tree produced by ExprParser#Variable.
     def enterVariable(self, ctx:ExprParser.VariableContext):
         pass

@@ -29,6 +29,36 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ExprParser#Declaration.
+    def visitDeclaration(self, ctx:ExprParser.DeclarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#DeclarationWithAssignment.
+    def visitDeclarationWithAssignment(self, ctx:ExprParser.DeclarationWithAssignmentContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#IntType.
+    def visitIntType(self, ctx:ExprParser.IntTypeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#FloatType.
+    def visitFloatType(self, ctx:ExprParser.FloatTypeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#BoolType.
+    def visitBoolType(self, ctx:ExprParser.BoolTypeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#StringType.
+    def visitStringType(self, ctx:ExprParser.StringTypeContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ExprParser#Variable.
     def visitVariable(self, ctx:ExprParser.VariableContext):
         return self.visitChildren(ctx)
