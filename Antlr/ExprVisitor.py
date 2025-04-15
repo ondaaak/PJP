@@ -129,13 +129,13 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ExprParser#AddSubConcat.
-    def visitAddSubConcat(self, ctx:ExprParser.AddSubConcatContext):
+    # Visit a parse tree produced by ExprParser#MulDivMod.
+    def visitMulDivMod(self, ctx:ExprParser.MulDivModContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ExprParser#MulDivMod.
-    def visitMulDivMod(self, ctx:ExprParser.MulDivModContext):
+    # Visit a parse tree produced by ExprParser#AddSubConcat.
+    def visitAddSubConcat(self, ctx:ExprParser.AddSubConcatContext):
         return self.visitChildren(ctx)
 
 

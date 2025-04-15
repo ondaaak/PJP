@@ -20,7 +20,7 @@ def serializedATN():
         4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,
         4,3,4,116,8,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,
         4,1,4,1,4,1,4,1,4,1,4,5,4,136,8,4,10,4,12,4,139,9,4,1,4,0,1,8,5,
-        0,2,4,6,8,0,4,1,0,25,26,1,0,27,30,2,0,8,9,31,31,1,0,10,12,166,0,
+        0,2,4,6,8,0,4,1,0,25,26,1,0,27,30,1,0,8,10,2,0,11,12,31,31,166,0,
         13,1,0,0,0,2,18,1,0,0,0,4,90,1,0,0,0,6,96,1,0,0,0,8,115,1,0,0,0,
         10,12,3,2,1,0,11,10,1,0,0,0,12,15,1,0,0,0,13,11,1,0,0,0,13,14,1,
         0,0,0,14,16,1,0,0,0,15,13,1,0,0,0,16,17,5,0,0,1,17,1,1,0,0,0,18,
@@ -45,7 +45,7 @@ def serializedATN():
         90,70,1,0,0,0,90,76,1,0,0,0,90,84,1,0,0,0,91,5,1,0,0,0,92,97,5,18,
         0,0,93,97,5,19,0,0,94,97,5,20,0,0,95,97,5,21,0,0,96,92,1,0,0,0,96,
         93,1,0,0,0,96,94,1,0,0,0,96,95,1,0,0,0,97,7,1,0,0,0,98,99,6,4,-1,
-        0,99,100,5,24,0,0,100,116,3,8,4,9,101,102,5,9,0,0,102,116,3,8,4,
+        0,99,100,5,24,0,0,100,116,3,8,4,9,101,102,5,12,0,0,102,116,3,8,4,
         8,103,104,5,33,0,0,104,105,5,3,0,0,105,116,3,8,4,7,106,116,5,34,
         0,0,107,116,5,35,0,0,108,116,5,32,0,0,109,116,5,36,0,0,110,116,5,
         33,0,0,111,112,5,6,0,0,112,113,3,8,4,0,113,114,5,7,0,0,114,116,1,
@@ -73,7 +73,7 @@ class ExprParser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "';'", "','", "'='", "'{'", "'}'", "'('", 
-                     "')'", "'+'", "'-'", "'*'", "'/'", "'%'", "'if'", "'else'", 
+                     "')'", "'*'", "'/'", "'%'", "'+'", "'-'", "'if'", "'else'", 
                      "'while'", "'read'", "'write'", "'int'", "'float'", 
                      "'bool'", "'string'", "'&&'", "'||'", "'!'", "'=='", 
                      "'!='", "'<'", "'>'", "'<='", "'>='", "'.'" ]
@@ -191,7 +191,7 @@ class ExprParser ( Parser ):
             self.state = 13
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 133164933714) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 133164937298) != 0):
                 self.state = 10
                 self.command()
                 self.state = 15
@@ -681,7 +681,7 @@ class ExprParser ( Parser ):
                 self.state = 66
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 133164933714) != 0):
+                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 133164937298) != 0):
                     self.state = 63
                     self.statement()
                     self.state = 68
@@ -1143,6 +1143,34 @@ class ExprParser ( Parser ):
                 return visitor.visitChildren(self)
 
 
+    class MulDivModContext(ExprContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a ExprParser.ExprContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def expr(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(ExprParser.ExprContext)
+            else:
+                return self.getTypedRuleContext(ExprParser.ExprContext,i)
+
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterMulDivMod" ):
+                listener.enterMulDivMod(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitMulDivMod" ):
+                listener.exitMulDivMod(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMulDivMod" ):
+                return visitor.visitMulDivMod(self)
+            else:
+                return visitor.visitChildren(self)
+
+
     class AddSubConcatContext(ExprContext):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a ExprParser.ExprContext
@@ -1169,34 +1197,6 @@ class ExprParser ( Parser ):
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitAddSubConcat" ):
                 return visitor.visitAddSubConcat(self)
-            else:
-                return visitor.visitChildren(self)
-
-
-    class MulDivModContext(ExprContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a ExprParser.ExprContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def expr(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(ExprParser.ExprContext)
-            else:
-                return self.getTypedRuleContext(ExprParser.ExprContext,i)
-
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMulDivMod" ):
-                listener.enterMulDivMod(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMulDivMod" ):
-                listener.exitMulDivMod(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitMulDivMod" ):
-                return visitor.visitMulDivMod(self)
             else:
                 return visitor.visitChildren(self)
 
@@ -1365,7 +1365,7 @@ class ExprParser ( Parser ):
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 101
-                self.match(ExprParser.T__8)
+                self.match(ExprParser.T__11)
                 self.state = 102
                 self.expr(8)
                 pass
@@ -1510,7 +1510,7 @@ class ExprParser ( Parser ):
                         pass
 
                     elif la_ == 5:
-                        localctx = ExprParser.AddSubConcatContext(self, ExprParser.ExprContext(self, _parentctx, _parentState))
+                        localctx = ExprParser.MulDivModContext(self, ExprParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
                         self.state = 129
                         if not self.precpred(self._ctx, 11):
@@ -1518,7 +1518,7 @@ class ExprParser ( Parser ):
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 11)")
                         self.state = 130
                         _la = self._input.LA(1)
-                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 2147484416) != 0)):
+                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 1792) != 0)):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
@@ -1528,7 +1528,7 @@ class ExprParser ( Parser ):
                         pass
 
                     elif la_ == 6:
-                        localctx = ExprParser.MulDivModContext(self, ExprParser.ExprContext(self, _parentctx, _parentState))
+                        localctx = ExprParser.AddSubConcatContext(self, ExprParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
                         self.state = 132
                         if not self.precpred(self._ctx, 10):
@@ -1536,7 +1536,7 @@ class ExprParser ( Parser ):
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 10)")
                         self.state = 133
                         _la = self._input.LA(1)
-                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 7168) != 0)):
+                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 2147489792) != 0)):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)

@@ -28,8 +28,8 @@ expr: expr '||' expr                         # LogicalOr
     | expr '&&' expr                         # LogicalAnd
     | expr ('==' | '!=') expr                # Equality
     | expr ('<' | '>' | '<=' | '>=') expr    # Relational
+    | expr ('*' | '/' | '%') expr            # MulDivMod     // SWAP: Přehoďte toto pravidlo s pravidlem pro AddSubConcat
     | expr ('+' | '-' | '.') expr            # AddSubConcat
-    | expr ('*' | '/' | '%') expr            # MulDivMod
     | '!' expr                               # LogicalNot
     | '-' expr                               # UnaryMinus
     | <assoc=right> ID '=' expr              # Assignment

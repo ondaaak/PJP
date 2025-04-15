@@ -224,21 +224,21 @@ class ExprListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ExprParser#AddSubConcat.
-    def enterAddSubConcat(self, ctx:ExprParser.AddSubConcatContext):
-        pass
-
-    # Exit a parse tree produced by ExprParser#AddSubConcat.
-    def exitAddSubConcat(self, ctx:ExprParser.AddSubConcatContext):
-        pass
-
-
     # Enter a parse tree produced by ExprParser#MulDivMod.
     def enterMulDivMod(self, ctx:ExprParser.MulDivModContext):
         pass
 
     # Exit a parse tree produced by ExprParser#MulDivMod.
     def exitMulDivMod(self, ctx:ExprParser.MulDivModContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#AddSubConcat.
+    def enterAddSubConcat(self, ctx:ExprParser.AddSubConcatContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#AddSubConcat.
+    def exitAddSubConcat(self, ctx:ExprParser.AddSubConcatContext):
         pass
 
 

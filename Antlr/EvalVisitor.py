@@ -559,3 +559,14 @@ class EvalVisitor(ExprVisitor):
         else:
             self.type_errors.append(f"Unknown type: {type_name}")
             return None
+
+    def visitUnaryMinus(self, ctx):
+        value = self.visit(ctx.expr())
+        
+        # Type checking
+        if not isinstance(value, (int, float)):
+            self.type_errors.append(f"Type error: Unary '-' operator requires numeric operand, got {type(value).__name__}")
+            return None
+            
+        # Zde je pravděpodobně problém - místo -value je použito value
+        return -value  # Ujistěte se, že vracíte -value, ne value nebo abs(value)
