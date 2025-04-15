@@ -37,9 +37,8 @@ class EvalVisitor(ExprVisitor):
         # Type checking and conversion
         expected_type = self.types[id_name]
         
-        # Automatická konverze int na float
         if expected_type == 'float' and isinstance(value, int):
-            value = float(value)  # Konvertuj int na float
+            value = float(value)  
         
         # Kontrola kompatibility typů
         if not self._check_type_compatibility(value, expected_type):
@@ -209,15 +208,12 @@ class EvalVisitor(ExprVisitor):
         return None
         
     def visitWhileStatement(self, ctx):
-        max_iterations = 1000  # Bezpečnostní limit iterací
+        max_iterations = 1000 
         iteration_count = 0
         
         while iteration_count < max_iterations:
             # Evaluate condition
             condition = self.visit(ctx.expr())
-            
-            # Odstranit debug výpis
-            # print(f"While condition evaluated to: {condition}, iteration: {iteration_count}")
             
             # Type checking for condition
             if not isinstance(condition, bool):
@@ -230,14 +226,10 @@ class EvalVisitor(ExprVisitor):
                 
             # Execute statement body
             self.visit(ctx.statement())
-            
-            # Odstranit debug výpis
-            # print(f"While loop memory after iteration {iteration_count}: {self.memory}")
-            
+
             # Increment counter to prevent infinite loops
             iteration_count += 1
         
-        # Varování, pokud jsme dosáhli limitu iterací
         if iteration_count >= max_iterations:
             self.type_errors.append(f"Warning: While loop reached maximum iteration limit ({max_iterations}), possible infinite loop")
                 
@@ -305,9 +297,6 @@ class EvalVisitor(ExprVisitor):
         right = self.visit(ctx.expr(1))
         op = ctx.getChild(1).getText()
         
-        # Odstranit debug výpis
-        # print(f"AddSubConcat operation: {left} {op} {right}")
-        
         # Type conversion for int to float if needed
         if op in ['+', '-'] and isinstance(left, int) and isinstance(right, float):
             left = float(left)
@@ -367,12 +356,10 @@ class EvalVisitor(ExprVisitor):
         right = self.visit(ctx.expr(1))
         op = ctx.getChild(1).getText()
         
-        # Kontrola typů - operandy by měly být stejného typu
         if type(left) != type(right) and not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
             self.type_errors.append(f"Type error: Cannot compare {type(left).__name__} and {type(right).__name__}")
             return None
         
-        # Provedení operace porovnání
         if op == '==':
             return left == right
         else:  # op == '!='
@@ -427,14 +414,12 @@ class EvalVisitor(ExprVisitor):
         
         # Type checking - operand musí být typu bool
         if not isinstance(value, bool):
-            # Pokus o automatickou konverzi na bool
             try:
                 value = bool(value)
             except:
                 self.type_errors.append(f"Type error: '!' operator requires boolean operand, got {type(value).__name__}")
                 return None
         
-        # Vrátit negaci hodnoty
         return not value
             
     def visitNotOp(self, ctx):
@@ -475,9 +460,7 @@ class EvalVisitor(ExprVisitor):
             self.type_errors.append(f"Variable '{id_name}' used before declaration")
             return None
         
-        # Get current value from memory (odstranit debug výpis)
         value = self.memory.get(id_name)
-        # print(f"Variable access: {id_name} = {value}")  # Odstranit tento řádek
         
         return value
         
@@ -491,7 +474,6 @@ class EvalVisitor(ExprVisitor):
         if expected_type == 'int':
             return isinstance(value, int)
         elif expected_type == 'float':
-            # Int může být automaticky konvertován na float
             return isinstance(value, (float, int))
         elif expected_type == 'bool':
             return isinstance(value, bool)
@@ -580,5 +562,4 @@ class EvalVisitor(ExprVisitor):
             self.type_errors.append(f"Type error: Unary '-' operator requires numeric operand, got {type(value).__name__}")
             return None
             
-        # Zde je pravděpodobně problém - místo -value je použito value
-        return -value  # Ujistěte se, že vracíte -value, ne value nebo abs(value)
+        return -value 
