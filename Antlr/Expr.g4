@@ -5,10 +5,17 @@ prog: command* EOF;
 
 command: statement;
 
-statement: expr ';'                          # ExprStatement
-         | ID '=' expr ';'                   # Assignment
-         | type ID ';'                       # Declaration
-         | type ID '=' expr ';'              # DeclarationWithAssignment
+statement: ';'                                # EmptyStatement
+         | expr ';'                           # ExprStatement
+         | ID '=' expr ';'                    # Assignment
+         | type ID (',' ID)* ';'              # Declaration
+         | type ID '=' expr ';'               # DeclarationWithAssignment
+         | 'read' ID (',' ID)* ';'            # ReadStatement
+         | 'write' expr (',' expr)* ';'       # WriteStatement
+         | '{' statement* '}'                 # BlockStatement
+         | 'if' '(' expr ')' statement        # IfStatement
+         | 'if' '(' expr ')' statement 'else' statement  # IfElseStatement
+         | 'while' '(' expr ')' statement     # WhileStatement
          ;
 
 type: 'int'                                  # IntType
@@ -19,6 +26,9 @@ type: 'int'                                  # IntType
 
 expr: expr op=('*'|'/') expr                 # MulDiv
     | expr op=('+'|'-') expr                 # AddSub
+    | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr  # Comparison
+    | expr op=('&&'|'||') expr               # LogicalOp
+    | '!' expr                               # NotOp
     | INT                                    # IntLiteral
     | FLOAT                                  # FloatLiteral
     | BOOL                                   # BoolLiteral
@@ -29,10 +39,26 @@ expr: expr op=('*'|'/') expr                 # MulDiv
 
 // Lexer rules
 // Keywords
+IF: 'if';
+ELSE: 'else';
+WHILE: 'while';
+READ: 'read';
+WRITE: 'write';
 INT_TYPE: 'int';
 FLOAT_TYPE: 'float';
 BOOL_TYPE: 'bool';
 STRING_TYPE: 'string';
+
+// Operators
+AND: '&&';
+OR: '||';
+NOT: '!';
+EQ: '==';
+NEQ: '!=';
+LT: '<';
+GT: '>';
+LE: '<=';
+GE: '>=';
 
 BOOL: 'true' | 'false';
 ID: [a-zA-Z][a-zA-Z0-9]*;      // Identifiers start with letter, can contain digits

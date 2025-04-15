@@ -39,6 +39,40 @@ y * 2;                  // Float arithmetic
 string s1 = "Concatenate ";
 string s2 = "strings";
 s1 + s2;                // String concatenation
+
+// Test write statement
+write "The value of x is: ", x;
+write "The result of x + intVar is: ", x + intVar;
+
+// Test if statement
+if (x > intVar) {
+    write "x is greater than intVar";
+} else {
+    write "x is not greater than intVar";
+}
+
+// Test while loop
+int i = 0;
+while (i < 5) {
+    write "Loop iteration: ", i;
+    i = i + 1;
+}
+
+// Test block statement with multiple statements
+{
+    int blockVar = 100;
+    write "Inside block, blockVar =", blockVar;
+    blockVar = blockVar * 2;
+    write "After modification, blockVar =", blockVar;
+}
+
+// Test logical operations
+bool result = (x > 30) && (intVar < 20);
+write "Logical AND result:", result;
+
+// Test comparison operations
+write "Equality test:", x == 42;
+write "Inequality test:", y != 3.0;
 """
     input_stream = InputStream(input_text)
     

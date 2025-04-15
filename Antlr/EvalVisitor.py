@@ -1,5 +1,6 @@
 from ExprVisitor import ExprVisitor
 from ExprParser import ExprParser
+import sys
 
 class EvalVisitor(ExprVisitor):
     def __init__(self):
@@ -18,6 +19,10 @@ class EvalVisitor(ExprVisitor):
         
     def visitCommand(self, ctx):
         return self.visit(ctx.statement())
+    
+    def visitEmptyStatement(self, ctx):
+        # Empty statement does nothing and returns nothing
+        return None
         
     def visitAssignment(self, ctx):
         id_name = ctx.ID().getText()
@@ -40,34 +45,35 @@ class EvalVisitor(ExprVisitor):
         return None  # Assignment doesn't return a value
         
     def visitDeclaration(self, ctx):
-        id_name = ctx.ID().getText()
-        # Fix: use type_ instead of type
         type_name = self.visit(ctx.type_())
         
-        # Check for redeclaration
-        if id_name in self.declared:
-            self.type_errors.append(f"Variable '{id_name}' already declared")
-            return None
+        # Process each variable in the declaration
+        for id_node in ctx.ID():
+            id_name = id_node.getText()
             
-        # Register the variable
-        self.declared.add(id_name)
-        self.types[id_name] = type_name
-        
-        # Set default value based on type
-        if type_name == 'int':
-            self.memory[id_name] = 0
-        elif type_name == 'float':
-            self.memory[id_name] = 0.0
-        elif type_name == 'bool':
-            self.memory[id_name] = False
-        elif type_name == 'string':
-            self.memory[id_name] = ""
+            # Check for redeclaration
+            if id_name in self.declared:
+                self.type_errors.append(f"Variable '{id_name}' already declared")
+                continue
+                
+            # Register the variable
+            self.declared.add(id_name)
+            self.types[id_name] = type_name
             
+            # Set default value based on type
+            if type_name == 'int':
+                self.memory[id_name] = 0
+            elif type_name == 'float':
+                self.memory[id_name] = 0.0
+            elif type_name == 'bool':
+                self.memory[id_name] = False
+            elif type_name == 'string':
+                self.memory[id_name] = ""
+                
         return None
         
     def visitDeclarationWithAssignment(self, ctx):
         id_name = ctx.ID().getText()
-        # Fix: use type_ instead of type
         type_name = self.visit(ctx.type_())
         
         # Check for redeclaration
@@ -97,6 +103,120 @@ class EvalVisitor(ExprVisitor):
         else:
             # Value is compatible, store it
             self.memory[id_name] = value
+            
+        return None
+    
+    def visitReadStatement(self, ctx):
+        # Process each variable in the read statement
+        for id_node in ctx.ID():
+            id_name = id_node.getText()
+            
+            # Check if variable is declared
+            if id_name not in self.declared:
+                self.type_errors.append(f"Variable '{id_name}' used before declaration")
+                continue
+                
+            # Get the type of the variable
+            var_type = self.types[id_name]
+            
+            # Read input from user
+            try:
+                input_value = input(f"Enter value for {id_name} ({var_type}): ")
+                
+                # Convert input to appropriate type
+                if var_type == 'int':
+                    value = int(input_value)
+                elif var_type == 'float':
+                    value = float(input_value)
+                elif var_type == 'bool':
+                    if input_value.lower() in ('true', 't', '1', 'yes', 'y'):
+                        value = True
+                    elif input_value.lower() in ('false', 'f', '0', 'no', 'n'):
+                        value = False
+                    else:
+                        self.type_errors.append(f"Invalid boolean value for variable '{id_name}': {input_value}")
+                        continue
+                elif var_type == 'string':
+                    value = input_value
+                else:
+                    self.type_errors.append(f"Unknown type for variable '{id_name}': {var_type}")
+                    continue
+                    
+                # Store the value
+                self.memory[id_name] = value
+                    
+            except ValueError:
+                self.type_errors.append(f"Invalid input for variable '{id_name}' of type {var_type}")
+                
+        return None
+        
+    def visitWriteStatement(self, ctx):
+        # Evaluate and print each expression
+        values = []
+        for expr_ctx in ctx.expr():
+            value = self.visit(expr_ctx)
+            values.append(value)
+            
+        # Print values separated by spaces, with newline at the end
+        print(" ".join(str(val) for val in values))
+        
+        return None
+        
+    def visitBlockStatement(self, ctx):
+        # Execute each statement in the block
+        for stmt_ctx in ctx.statement():
+            self.visit(stmt_ctx)
+            
+        return None
+        
+    def visitIfStatement(self, ctx):
+        # Evaluate condition
+        condition = self.visit(ctx.expr())
+        
+        # Type checking for condition
+        if not isinstance(condition, bool):
+            self.type_errors.append(f"Type error: If condition must be boolean, got {type(condition).__name__}")
+            return None
+            
+        # Execute statement if condition is true
+        if condition:
+            self.visit(ctx.statement())
+            
+        return None
+        
+    def visitIfElseStatement(self, ctx):
+        # Evaluate condition
+        condition = self.visit(ctx.expr())
+        
+        # Type checking for condition
+        if not isinstance(condition, bool):
+            self.type_errors.append(f"Type error: If condition must be boolean, got {type(condition).__name__}")
+            return None
+            
+        # Execute appropriate branch based on condition
+        if condition:
+            self.visit(ctx.statement(0))  # First statement (if branch)
+        else:
+            self.visit(ctx.statement(1))  # Second statement (else branch)
+            
+        return None
+        
+    def visitWhileStatement(self, ctx):
+        while True:
+            # Evaluate condition
+            condition = self.visit(ctx.expr())
+            
+            # Type checking for condition
+            if not isinstance(condition, bool):
+                self.type_errors.append(f"Type error: While condition must be boolean, got {type(condition).__name__}")
+                return None
+                
+            # Exit loop if condition is false
+            if not condition:
+                break
+                
+            # Execute statement body
+            self.visit(ctx.statement())
             
         return None
         
@@ -156,6 +276,71 @@ class EvalVisitor(ExprVisitor):
             return left + right
         else:
             return left - right
+            
+    def visitComparison(self, ctx):
+        left = self.visit(ctx.expr(0))
+        right = self.visit(ctx.expr(1))
+        
+        # Check that types are comparable
+        if type(left) != type(right) and not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
+            error_msg = f"Type error: Cannot compare {type(left).__name__} and {type(right).__name__} with operator '{ctx.op.text}'"
+            self.type_errors.append(error_msg)
+            return None
+            
+        # Perform comparison
+        if ctx.op.text == '<':
+            return left < right
+        elif ctx.op.text == '>':
+            return left > right
+        elif ctx.op.text == '<=':
+            return left <= right
+        elif ctx.op.text == '>=':
+            return left >= right
+        elif ctx.op.text == '==':
+            return left == right
+        elif ctx.op.text == '!=':
+            return left != right
+            
+    def visitLogicalOp(self, ctx):
+        left = self.visit(ctx.expr(0))
+        
+        # Type checking for left operand
+        if not isinstance(left, bool):
+            error_msg = f"Type error: '{ctx.op.text}' operator requires boolean operands, got {type(left).__name__}"
+            self.type_errors.append(error_msg)
+            return None
+            
+        # Short-circuit evaluation
+        if ctx.op.text == '&&' and not left:
+            return False
+        elif ctx.op.text == '||' and left:
+            return True
+            
+        # Evaluate right operand if needed
+        right = self.visit(ctx.expr(1))
+        
+        # Type checking for right operand
+        if not isinstance(right, bool):
+            error_msg = f"Type error: '{ctx.op.text}' operator requires boolean operands, got {type(right).__name__}"
+            self.type_errors.append(error_msg)
+            return None
+            
+        # Perform logical operation
+        if ctx.op.text == '&&':
+            return left and right
+        elif ctx.op.text == '||':
+            return left or right
+            
+    def visitNotOp(self, ctx):
+        operand = self.visit(ctx.expr())
+        
+        # Type checking
+        if not isinstance(operand, bool):
+            error_msg = f"Type error: '!' operator requires boolean operand, got {type(operand).__name__}"
+            self.type_errors.append(error_msg)
+            return None
+            
+        return not operand
             
     def visitIntLiteral(self, ctx):
         return int(ctx.INT().getText())
