@@ -367,20 +367,12 @@ class EvalVisitor(ExprVisitor):
         right = self.visit(ctx.expr(1))
         op = ctx.getChild(1).getText()
         
-        # Type conversion for int to float if needed
-        if isinstance(left, int) and isinstance(right, float):
-            left = float(left)
-        elif isinstance(left, float) and isinstance(right, int):
-            right = float(right)
-        
-        # Type checking for equality operators
-        # Allow equality/inequality for all types, but operands must be comparable
-        allowed_types = (int, float, str)
-        if not (type(left) == type(right) or 
-                (isinstance(left, allowed_types) and isinstance(right, allowed_types))):
-            self.type_errors.append(f"Type error: Cannot compare {type(left).__name__} and {type(right).__name__} with operator '{op}'")
+        # Kontrola typů - operandy by měly být stejného typu
+        if type(left) != type(right) and not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
+            self.type_errors.append(f"Type error: Cannot compare {type(left).__name__} and {type(right).__name__}")
             return None
-            
+        
+        # Provedení operace porovnání
         if op == '==':
             return left == right
         else:  # op == '!='
@@ -429,6 +421,21 @@ class EvalVisitor(ExprVisitor):
             return None
             
         return left or right
+        
+    def visitLogicalNot(self, ctx):
+        value = self.visit(ctx.expr())
+        
+        # Type checking - operand musí být typu bool
+        if not isinstance(value, bool):
+            # Pokus o automatickou konverzi na bool
+            try:
+                value = bool(value)
+            except:
+                self.type_errors.append(f"Type error: '!' operator requires boolean operand, got {type(value).__name__}")
+                return None
+        
+        # Vrátit negaci hodnoty
+        return not value
             
     def visitNotOp(self, ctx):
         operand = self.visit(ctx.expr())
