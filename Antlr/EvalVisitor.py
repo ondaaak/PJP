@@ -34,18 +34,20 @@ class EvalVisitor(ExprVisitor):
             
         value = self.visit(ctx.expr())
         
-        # Type checking
+        # Type checking and conversion
         expected_type = self.types[id_name]
+        
+        # Automatická konverze int na float
+        if expected_type == 'float' and isinstance(value, int):
+            value = float(value)  # Konvertuj int na float
+        
+        # Kontrola kompatibility typů
         if not self._check_type_compatibility(value, expected_type):
             self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{id_name}' of type {expected_type}")
             return None
             
         # Store value
         self.memory[id_name] = value
-        
-        # Odstranit debug výpisy
-        # print(f"Assignment: {id_name} = {value}")
-        # print(f"Memory after assignment: {self.memory}")
         
         return value  # Assignment returns the assigned value
         
@@ -476,17 +478,20 @@ class EvalVisitor(ExprVisitor):
         return self.visit(ctx.expr())
         
     def _check_type_compatibility(self, value, expected_type):
-        """Check if a value is compatible with the expected type."""
+        """
+        Kontroluje, zda je hodnota kompatibilní s očekávaným typem
+        """
         if expected_type == 'int':
             return isinstance(value, int)
         elif expected_type == 'float':
-            # Allow int to float conversion
-            return isinstance(value, (int, float))
+            # Int může být automaticky konvertován na float
+            return isinstance(value, (float, int))
         elif expected_type == 'bool':
             return isinstance(value, bool)
         elif expected_type == 'string':
             return isinstance(value, str)
-        return False
+        else:
+            return False
 
     def visitId(self, ctx):
         id_name = ctx.getText()
