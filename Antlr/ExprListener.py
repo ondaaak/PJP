@@ -44,15 +44,6 @@ class ExprListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ExprParser#Assignment.
-    def enterAssignment(self, ctx:ExprParser.AssignmentContext):
-        pass
-
-    # Exit a parse tree produced by ExprParser#Assignment.
-    def exitAssignment(self, ctx:ExprParser.AssignmentContext):
-        pass
-
-
     # Enter a parse tree produced by ExprParser#Declaration.
     def enterDeclaration(self, ctx:ExprParser.DeclarationContext):
         pass
@@ -170,51 +161,6 @@ class ExprListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ExprParser#BoolLiteral.
-    def enterBoolLiteral(self, ctx:ExprParser.BoolLiteralContext):
-        pass
-
-    # Exit a parse tree produced by ExprParser#BoolLiteral.
-    def exitBoolLiteral(self, ctx:ExprParser.BoolLiteralContext):
-        pass
-
-
-    # Enter a parse tree produced by ExprParser#StringLiteral.
-    def enterStringLiteral(self, ctx:ExprParser.StringLiteralContext):
-        pass
-
-    # Exit a parse tree produced by ExprParser#StringLiteral.
-    def exitStringLiteral(self, ctx:ExprParser.StringLiteralContext):
-        pass
-
-
-    # Enter a parse tree produced by ExprParser#MulDiv.
-    def enterMulDiv(self, ctx:ExprParser.MulDivContext):
-        pass
-
-    # Exit a parse tree produced by ExprParser#MulDiv.
-    def exitMulDiv(self, ctx:ExprParser.MulDivContext):
-        pass
-
-
-    # Enter a parse tree produced by ExprParser#AddSub.
-    def enterAddSub(self, ctx:ExprParser.AddSubContext):
-        pass
-
-    # Exit a parse tree produced by ExprParser#AddSub.
-    def exitAddSub(self, ctx:ExprParser.AddSubContext):
-        pass
-
-
-    # Enter a parse tree produced by ExprParser#Comparison.
-    def enterComparison(self, ctx:ExprParser.ComparisonContext):
-        pass
-
-    # Exit a parse tree produced by ExprParser#Comparison.
-    def exitComparison(self, ctx:ExprParser.ComparisonContext):
-        pass
-
-
     # Enter a parse tree produced by ExprParser#FloatLiteral.
     def enterFloatLiteral(self, ctx:ExprParser.FloatLiteralContext):
         pass
@@ -233,12 +179,93 @@ class ExprListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ExprParser#LogicalOp.
-    def enterLogicalOp(self, ctx:ExprParser.LogicalOpContext):
+    # Enter a parse tree produced by ExprParser#Relational.
+    def enterRelational(self, ctx:ExprParser.RelationalContext):
         pass
 
-    # Exit a parse tree produced by ExprParser#LogicalOp.
-    def exitLogicalOp(self, ctx:ExprParser.LogicalOpContext):
+    # Exit a parse tree produced by ExprParser#Relational.
+    def exitRelational(self, ctx:ExprParser.RelationalContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#UnaryMinus.
+    def enterUnaryMinus(self, ctx:ExprParser.UnaryMinusContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#UnaryMinus.
+    def exitUnaryMinus(self, ctx:ExprParser.UnaryMinusContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#LogicalOr.
+    def enterLogicalOr(self, ctx:ExprParser.LogicalOrContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#LogicalOr.
+    def exitLogicalOr(self, ctx:ExprParser.LogicalOrContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#LogicalNot.
+    def enterLogicalNot(self, ctx:ExprParser.LogicalNotContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#LogicalNot.
+    def exitLogicalNot(self, ctx:ExprParser.LogicalNotContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#Assignment.
+    def enterAssignment(self, ctx:ExprParser.AssignmentContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#Assignment.
+    def exitAssignment(self, ctx:ExprParser.AssignmentContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#AddSubConcat.
+    def enterAddSubConcat(self, ctx:ExprParser.AddSubConcatContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#AddSubConcat.
+    def exitAddSubConcat(self, ctx:ExprParser.AddSubConcatContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#MulDivMod.
+    def enterMulDivMod(self, ctx:ExprParser.MulDivModContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#MulDivMod.
+    def exitMulDivMod(self, ctx:ExprParser.MulDivModContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#BoolLiteral.
+    def enterBoolLiteral(self, ctx:ExprParser.BoolLiteralContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#BoolLiteral.
+    def exitBoolLiteral(self, ctx:ExprParser.BoolLiteralContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#StringLiteral.
+    def enterStringLiteral(self, ctx:ExprParser.StringLiteralContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#StringLiteral.
+    def exitStringLiteral(self, ctx:ExprParser.StringLiteralContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#LogicalAnd.
+    def enterLogicalAnd(self, ctx:ExprParser.LogicalAndContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#LogicalAnd.
+    def exitLogicalAnd(self, ctx:ExprParser.LogicalAndContext):
         pass
 
 
@@ -251,12 +278,12 @@ class ExprListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ExprParser#NotOp.
-    def enterNotOp(self, ctx:ExprParser.NotOpContext):
+    # Enter a parse tree produced by ExprParser#Equality.
+    def enterEquality(self, ctx:ExprParser.EqualityContext):
         pass
 
-    # Exit a parse tree produced by ExprParser#NotOp.
-    def exitNotOp(self, ctx:ExprParser.NotOpContext):
+    # Exit a parse tree produced by ExprParser#Equality.
+    def exitEquality(self, ctx:ExprParser.EqualityContext):
         pass
 
 

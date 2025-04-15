@@ -7,7 +7,6 @@ command: statement;
 
 statement: ';'                                # EmptyStatement
          | expr ';'                           # ExprStatement
-         | ID '=' expr ';'                    # Assignment
          | type ID (',' ID)* ';'              # Declaration
          | type ID '=' expr ';'               # DeclarationWithAssignment
          | 'read' ID (',' ID)* ';'            # ReadStatement
@@ -24,11 +23,16 @@ type: 'int'                                  # IntType
     | 'string'                               # StringType
     ;
 
-expr: expr op=('*'|'/') expr                 # MulDiv
-    | expr op=('+'|'-') expr                 # AddSub
-    | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr  # Comparison
-    | expr op=('&&'|'||') expr               # LogicalOp
-    | '!' expr                               # NotOp
+// Expression with operator precedence (from lowest to highest)
+expr: expr '||' expr                         # LogicalOr
+    | expr '&&' expr                         # LogicalAnd
+    | expr ('==' | '!=') expr                # Equality
+    | expr ('<' | '>' | '<=' | '>=') expr    # Relational
+    | expr ('+' | '-' | '.') expr            # AddSubConcat
+    | expr ('*' | '/' | '%') expr            # MulDivMod
+    | '!' expr                               # LogicalNot
+    | '-' expr                               # UnaryMinus
+    | <assoc=right> ID '=' expr              # Assignment
     | INT                                    # IntLiteral
     | FLOAT                                  # FloatLiteral
     | BOOL                                   # BoolLiteral
@@ -59,6 +63,7 @@ LT: '<';
 GT: '>';
 LE: '<=';
 GE: '>=';
+CONCAT: '.';
 
 BOOL: 'true' | 'false';
 ID: [a-zA-Z][a-zA-Z0-9]*;      // Identifiers start with letter, can contain digits

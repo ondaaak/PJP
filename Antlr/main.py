@@ -3,8 +3,7 @@ from antlr4.error.ErrorListener import ErrorListener
 from ExprLexer import ExprLexer
 from ExprParser import ExprParser
 from EvalVisitor import EvalVisitor
-from EvalListener import EvalListener
-
+# from EvalListener import EvalListener  # Odstraněno, už nepoužíváme
 class SyntaxErrorListener(ErrorListener):
     def __init__(self):
         super(SyntaxErrorListener, self).__init__()
@@ -51,11 +50,11 @@ if (x > intVar) {
     write "x is not greater than intVar";
 }
 
-// Test while loop
+// Test while loop - fixed version without variable increment
 int i = 0;
 while (i < 5) {
     write "Loop iteration: ", i;
-    i = i + 1;
+    i = 1 + i;  // Changed order to test if that makes a difference
 }
 
 // Test block statement with multiple statements
@@ -119,14 +118,14 @@ write "Inequality test:", y != 3.0;
     for key, value in visitor.memory.items():
         print(f"{key}: {value} (type: {visitor.types.get(key, 'unknown')})")
 
-    # Also demonstrate listener-based approach
-    listener = EvalListener()
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-
-    print("\nVariable values from listener:")
-    for key, value in listener.values.items():
-        print(f"{key}: {value} (type: {listener.types.get(key, 'unknown')})")
+    # Remove the listener part
+    # listener = EvalListener()
+    # walker = ParseTreeWalker()
+    # walker.walk(listener, tree)
+    #
+    # print("\nVariable values from listener:")
+    # for key, value in listener.values.items():
+    #     print(f"{key}: {value} (type: {listener.types.get(key, 'unknown')})")
 
 if __name__ == '__main__':
     main()

@@ -42,7 +42,12 @@ class EvalVisitor(ExprVisitor):
             
         # Store value
         self.memory[id_name] = value
-        return None  # Assignment doesn't return a value
+        
+        # Odstranit debug výpisy
+        # print(f"Assignment: {id_name} = {value}")
+        # print(f"Memory after assignment: {self.memory}")
+        
+        return value  # Assignment returns the assigned value
         
     def visitDeclaration(self, ctx):
         type_name = self.visit(ctx.type_())
@@ -202,9 +207,15 @@ class EvalVisitor(ExprVisitor):
         return None
         
     def visitWhileStatement(self, ctx):
-        while True:
+        max_iterations = 1000  # Bezpečnostní limit iterací
+        iteration_count = 0
+        
+        while iteration_count < max_iterations:
             # Evaluate condition
             condition = self.visit(ctx.expr())
+            
+            # Odstranit debug výpis
+            # print(f"While condition evaluated to: {condition}, iteration: {iteration_count}")
             
             # Type checking for condition
             if not isinstance(condition, bool):
@@ -218,6 +229,16 @@ class EvalVisitor(ExprVisitor):
             # Execute statement body
             self.visit(ctx.statement())
             
+            # Odstranit debug výpis
+            # print(f"While loop memory after iteration {iteration_count}: {self.memory}")
+            
+            # Increment counter to prevent infinite loops
+            iteration_count += 1
+        
+        # Varování, pokud jsme dosáhli limitu iterací
+        if iteration_count >= max_iterations:
+            self.type_errors.append(f"Warning: While loop reached maximum iteration limit ({max_iterations}), possible infinite loop")
+                
         return None
         
     def visitIntType(self, ctx):
@@ -235,101 +256,177 @@ class EvalVisitor(ExprVisitor):
     def visitExprStatement(self, ctx):
         return self.visit(ctx.expr())
         
-    def visitMulDiv(self, ctx):
+    # Arithmetic operations
+    def visitMulDivMod(self, ctx):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
+        op = ctx.getChild(1).getText()
+        
+        # Type conversion for int to float if needed
+        if isinstance(left, int) and isinstance(right, float):
+            left = float(left)
+        elif isinstance(left, float) and isinstance(right, int):
+            right = float(right)
         
         # Type checking
-        if not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
-            error_msg = f"Type error: '{ctx.op.text}' operator requires numeric operands, got {type(left).__name__} and {type(right).__name__}"
-            self.type_errors.append(error_msg)
-            return None
+        if op == '%':
+            # Modulo only works on integers
+            if not (isinstance(left, int) and isinstance(right, int)):
+                self.type_errors.append(f"Type error: '%' operator requires integer operands, got {type(left).__name__} and {type(right).__name__}")
+                return None
+        else:
+            # Multiplication and division require numeric operands
+            if not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
+                self.type_errors.append(f"Type error: '{op}' operator requires numeric operands, got {type(left).__name__} and {type(right).__name__}")
+                return None
             
-        if ctx.op.text == '*':
+        if op == '*':
             return left * right
-        else:  # Division
+        elif op == '/':
             if right == 0:
                 self.type_errors.append("Runtime error: Division by zero")
                 return None
                 
-            # Integer division for int/int, float division otherwise
+            # Division between integers produces int result (integer division)
             if isinstance(left, int) and isinstance(right, int):
                 return left // right
             else:
                 return left / right
+        elif op == '%':
+            if right == 0:
+                self.type_errors.append("Runtime error: Modulo by zero")
+                return None
+            return left % right
             
-    def visitAddSub(self, ctx):
+    def visitAddSubConcat(self, ctx):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
+        op = ctx.getChild(1).getText()
         
-        # Special case for string concatenation
-        if ctx.op.text == '+' and isinstance(left, str) and isinstance(right, str):
+        # Odstranit debug výpis
+        # print(f"AddSubConcat operation: {left} {op} {right}")
+        
+        # Type conversion for int to float if needed
+        if op in ['+', '-'] and isinstance(left, int) and isinstance(right, float):
+            left = float(left)
+        elif op in ['+', '-'] and isinstance(left, float) and isinstance(right, int):
+            right = float(right)
+        
+        # Type checking based on operator
+        if op == '.':
+            # String concatenation
+            if not (isinstance(left, str) and isinstance(right, str)):
+                self.type_errors.append(f"Type error: '.' operator requires string operands, got {type(left).__name__} and {type(right).__name__}")
+                return None
             return left + right
-            
-        # Type checking for numeric operations
-        if not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
-            error_msg = f"Type error: '{ctx.op.text}' operator requires numeric operands, got {type(left).__name__} and {type(right).__name__}"
-            self.type_errors.append(error_msg)
-            return None
-            
-        if ctx.op.text == '+':
+        elif op == '+':
+            # Addition requires numeric operands or string concatenation
+            if isinstance(left, str) and isinstance(right, str):
+                return left + right
+            elif not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
+                self.type_errors.append(f"Type error: '{op}' operator requires numeric operands, got {type(left).__name__} and {type(right).__name__}")
+                return None
             return left + right
-        else:
+        else:  # op == '-'
+            # Subtraction requires numeric operands
+            if not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
+                self.type_errors.append(f"Type error: '{op}' operator requires numeric operands, got {type(left).__name__} and {type(right).__name__}")
+                return None
             return left - right
             
-    def visitComparison(self, ctx):
+    def visitRelational(self, ctx):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
+        op = ctx.getChild(1).getText()
         
-        # Check that types are comparable
-        if type(left) != type(right) and not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
-            error_msg = f"Type error: Cannot compare {type(left).__name__} and {type(right).__name__} with operator '{ctx.op.text}'"
-            self.type_errors.append(error_msg)
+        # Type conversion for int to float if needed
+        if isinstance(left, int) and isinstance(right, float):
+            left = float(left)
+        elif isinstance(left, float) and isinstance(right, int):
+            right = float(right)
+        
+        # Type checking for relational operators
+        if not ((isinstance(left, int) and isinstance(right, int)) or 
+                (isinstance(left, float) and isinstance(right, float))):
+            self.type_errors.append(f"Type error: '{op}' operator requires numeric operands of the same type, got {type(left).__name__} and {type(right).__name__}")
             return None
             
-        # Perform comparison
-        if ctx.op.text == '<':
+        if op == '<':
             return left < right
-        elif ctx.op.text == '>':
+        elif op == '>':
             return left > right
-        elif ctx.op.text == '<=':
+        elif op == '<=':
             return left <= right
-        elif ctx.op.text == '>=':
+        elif op == '>=':
             return left >= right
-        elif ctx.op.text == '==':
+            
+    def visitEquality(self, ctx):
+        left = self.visit(ctx.expr(0))
+        right = self.visit(ctx.expr(1))
+        op = ctx.getChild(1).getText()
+        
+        # Type conversion for int to float if needed
+        if isinstance(left, int) and isinstance(right, float):
+            left = float(left)
+        elif isinstance(left, float) and isinstance(right, int):
+            right = float(right)
+        
+        # Type checking for equality operators
+        # Allow equality/inequality for all types, but operands must be comparable
+        allowed_types = (int, float, str)
+        if not (type(left) == type(right) or 
+                (isinstance(left, allowed_types) and isinstance(right, allowed_types))):
+            self.type_errors.append(f"Type error: Cannot compare {type(left).__name__} and {type(right).__name__} with operator '{op}'")
+            return None
+            
+        if op == '==':
             return left == right
-        elif ctx.op.text == '!=':
+        else:  # op == '!='
             return left != right
             
-    def visitLogicalOp(self, ctx):
+    def visitLogicalAnd(self, ctx):
         left = self.visit(ctx.expr(0))
         
         # Type checking for left operand
         if not isinstance(left, bool):
-            error_msg = f"Type error: '{ctx.op.text}' operator requires boolean operands, got {type(left).__name__}"
-            self.type_errors.append(error_msg)
+            self.type_errors.append(f"Type error: '&&' operator requires boolean operands, got {type(left).__name__}")
             return None
             
         # Short-circuit evaluation
-        if ctx.op.text == '&&' and not left:
+        if not left:
             return False
-        elif ctx.op.text == '||' and left:
-            return True
             
-        # Evaluate right operand if needed
+        # Evaluate right operand
         right = self.visit(ctx.expr(1))
         
         # Type checking for right operand
         if not isinstance(right, bool):
-            error_msg = f"Type error: '{ctx.op.text}' operator requires boolean operands, got {type(right).__name__}"
-            self.type_errors.append(error_msg)
+            self.type_errors.append(f"Type error: '&&' operator requires boolean operands, got {type(right).__name__}")
             return None
             
-        # Perform logical operation
-        if ctx.op.text == '&&':
-            return left and right
-        elif ctx.op.text == '||':
-            return left or right
+        return left and right
+            
+    def visitLogicalOr(self, ctx):
+        left = self.visit(ctx.expr(0))
+        
+        # Type checking for left operand
+        if not isinstance(left, bool):
+            self.type_errors.append(f"Type error: '||' operator requires boolean operands, got {type(left).__name__}")
+            return None
+            
+        # Short-circuit evaluation
+        if left:
+            return True
+            
+        # Evaluate right operand
+        right = self.visit(ctx.expr(1))
+        
+        # Type checking for right operand
+        if not isinstance(right, bool):
+            self.type_errors.append(f"Type error: '||' operator requires boolean operands, got {type(right).__name__}")
+            return None
+            
+        return left or right
             
     def visitNotOp(self, ctx):
         operand = self.visit(ctx.expr())
@@ -368,8 +465,12 @@ class EvalVisitor(ExprVisitor):
         if id_name not in self.declared:
             self.type_errors.append(f"Variable '{id_name}' used before declaration")
             return None
-            
-        return self.memory[id_name]
+        
+        # Get current value from memory (odstranit debug výpis)
+        value = self.memory.get(id_name)
+        # print(f"Variable access: {id_name} = {value}")  # Odstranit tento řádek
+        
+        return value
         
     def visitParens(self, ctx):
         return self.visit(ctx.expr())
@@ -386,3 +487,75 @@ class EvalVisitor(ExprVisitor):
         elif expected_type == 'string':
             return isinstance(value, str)
         return False
+
+    def visitId(self, ctx):
+        id_name = ctx.getText()
+        
+        # Check if variable is declared
+        if id_name not in self.declared:
+            self.type_errors.append(f"Variable '{id_name}' used before declaration")
+            return None
+            
+        # Return the variable value from memory
+        return self.memory.get(id_name, self._get_default_value(self.types[id_name]))
+
+    def visitProgram(self, ctx):
+        """
+        Hlavní metoda pro návštěvu programu - zpracovává jednotlivé příkazy sekvenčně
+        """
+        results = []
+        
+        # Process each statement in the program
+        for statement in ctx.statement():
+            result = self.visit(statement)
+            # Store non-None results
+            if result is not None:
+                results.append(result)
+                
+        return results
+
+    def visitVarDeclaration(self, ctx):
+        """
+        Zpracovává deklaraci proměnné, ukládá typ a inicializuje hodnotu
+        """
+        var_type = ctx.type_().getText()
+        var_name = ctx.ID().getText()
+        
+        # Check if variable is already declared
+        if var_name in self.declared:
+            # Skip re-declaration if this happens in a loop (just return current value)
+            return self.memory.get(var_name)
+        
+        # Declare the variable - mark as declared and set its type
+        self.declared.add(var_name)
+        self.types[var_name] = var_type
+        
+        # Initialize with value if assignment is present
+        if ctx.expr():
+            value = self.visit(ctx.expr())
+            
+            # Type checking for initial value
+            if not self._check_type_compatibility(value, var_type):
+                self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{var_name}' of type {var_type}")
+                return None
+                
+            self.memory[var_name] = value
+        else:
+            # Initialize with default value if no assignment
+            self.memory[var_name] = self._get_default_value(var_type)
+        
+        return self.memory[var_name]
+
+    def _get_default_value(self, type_name):
+        """Vrací výchozí hodnotu pro daný typ proměnné"""
+        if type_name == 'int':
+            return 0
+        elif type_name == 'float':
+            return 0.0
+        elif type_name == 'bool':
+            return False
+        elif type_name == 'string':
+            return ""
+        else:
+            self.type_errors.append(f"Unknown type: {type_name}")
+            return None
