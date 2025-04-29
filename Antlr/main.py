@@ -18,15 +18,6 @@ def main():
 write "<Relational operators>";
 write "1<5: ", 1 < 5;
 write "1>3.5: ", 1 > 3.5;
-write "aa==aa: ", "aa"=="aa";
-write "aa==ab: ", "aa"=="ab";
-write "aa!=ab: ", "aa"!="ab";
-write "";
-write "<Logic operators>";
-write "false and true (false):", false && true;
-write "false or true (true):", false || true;
-write "not 1==2 (true):", !(1==2);
-write "true or false and true (true):", true || false && true;
 """
     
     input_stream = InputStream(input_text)

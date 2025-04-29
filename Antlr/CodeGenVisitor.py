@@ -85,19 +85,30 @@ class CodeGenVisitor(ExprVisitor):
         self.code.append("not")
 
     def visitRelational(self, ctx):
-        self.visit(ctx.expr(0))
-        self.visit(ctx.expr(1))
+        left_ctx = ctx.expr(0)
+        right_ctx = ctx.expr(1)
+        left_type = self.getExprType(left_ctx)
+        right_type = self.getExprType(right_ctx)
+
+        self.visit(left_ctx)
+        if left_type == 'int' and right_type == 'float':
+            self.code.append("itof")
+        self.visit(right_ctx)
+        if right_type == 'int' and left_type == 'float':
+            self.code.append("itof")
+
         op = ctx.getChild(1).getText()
-        if op == '>':
-            self.code.append("gt I")  # nebo "gt F" podle typu
-        elif op == '<':
-            self.code.append("lt I")  # nebo "lt F" podle typu
-        elif op == '>=':
-            # gt + eq kombinace, nebo přidej instrukci dle zadání
-            pass
-        elif op == '<=':
-            # lt + eq kombinace, nebo přidej instrukci dle zadání
-            pass
+        if op == '<':
+            if left_type == 'float' or right_type == 'float':
+                self.code.append("lt F")
+            else:
+                self.code.append("lt I")
+        elif op == '>':
+            if left_type == 'float' or right_type == 'float':
+                self.code.append("gt F")
+            else:
+                self.code.append("gt I")
+        # ... další operátory ...
 
     def visitEquality(self, ctx):
         self.visit(ctx.expr(0))
@@ -111,3 +122,26 @@ class CodeGenVisitor(ExprVisitor):
     def visitItf(self, ctx):
         self.visit(ctx.expr())
         self.code.append("itof")
+
+    def visitWriteStatement(self, ctx):
+        n = len(ctx.expr())
+        for expr_ctx in ctx.expr():
+            self.visit(expr_ctx)
+        self.code.append(f"print {n}")
+
+    def getExprType(self, ctx):
+        # Zjednodušeně: podle typu uzlu
+        if hasattr(ctx, 'INT'):
+            return 'int'
+        if hasattr(ctx, 'FLOAT'):
+            return 'float'
+        if hasattr(ctx, 'STRING'):
+            return 'string'
+        if hasattr(ctx, 'BOOL'):
+            return 'bool'
+        # Pokud je to proměnná, vrať typ proměnné (musíš mít slovník typů)
+        if hasattr(ctx, 'ID'):
+            var_name = ctx.ID().getText()
+            return self.var_types.get(var_name, None)
+        # Doplň další podle potřeby
+        return None
