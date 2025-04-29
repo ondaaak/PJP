@@ -4,9 +4,9 @@ import sys
 
 class EvalVisitor(ExprVisitor):
     def __init__(self):
-        self.memory = {}   # Store variable values
-        self.types = {}    # Store variable types
-        self.declared = set()  # Track declared variables
+        self.memory = {}   
+        self.types = {}    
+        self.declared = set()  
         self.type_errors = []
         
     def visitProg(self, ctx):
@@ -22,52 +22,43 @@ class EvalVisitor(ExprVisitor):
         return self.visit(ctx.statement())
     
     def visitEmptyStatement(self, ctx):
-        # Empty statement does nothing and returns nothing
         return None
         
     def visitAssignment(self, ctx):
         id_name = ctx.ID().getText()
         
-        # Check if variable is declared
         if id_name not in self.declared:
             self.type_errors.append(f"Variable '{id_name}' used before declaration")
             return None
             
         value = self.visit(ctx.expr())
         
-        # Type checking and conversion
         expected_type = self.types[id_name]
         
         if expected_type == 'float' and isinstance(value, int):
             value = float(value)  
         
-        # Kontrola kompatibility typů
         if not self._check_type_compatibility(value, expected_type):
             self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{id_name}' of type {expected_type}")
             return None
             
-        # Store value
         self.memory[id_name] = value
         
-        return value  # Assignment returns the assigned value
+        return value 
         
     def visitDeclaration(self, ctx):
         type_name = self.visit(ctx.type_())
         
-        # Process each variable in the declaration
         for id_node in ctx.ID():
             id_name = id_node.getText()
             
-            # Check for redeclaration
             if id_name in self.declared:
                 self.type_errors.append(f"Variable '{id_name}' already declared")
                 continue
                 
-            # Register the variable
             self.declared.add(id_name)
             self.types[id_name] = type_name
             
-            # Set default value based on type
             if type_name == 'int':
                 self.memory[id_name] = 0
             elif type_name == 'float':
@@ -77,7 +68,7 @@ class EvalVisitor(ExprVisitor):
             elif type_name == 'string':
                 self.memory[id_name] = ""
             if type_name == 'FILE':
-                self.memory[id_name] = None  # nebo otevřený soubor, pokud budeš implementovat práci se soubory
+                self.memory[id_name] = None 
                 
         return None
         
@@ -85,7 +76,6 @@ class EvalVisitor(ExprVisitor):
         type_name = self.visit(ctx.type_())
         id_name = ctx.ID().getText()
         value = self.visit(ctx.expr())
-        # Povolit přiřazení stringu do FILE
         if type_name == 'FILE':
             if not isinstance(value, str):
                 self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{id_name}' of type FILE")
@@ -94,24 +84,19 @@ class EvalVisitor(ExprVisitor):
             self.types[id_name] = 'FILE'
             self.declared.add(id_name)
             return value
-        # ...ostatní typy...
         
-        # Check for redeclaration
         if id_name in self.declared:
             self.type_errors.append(f"Variable '{id_name}' already declared")
             return None
             
-        # Register the variable
         self.declared.add(id_name)
         self.types[id_name] = type_name
         
-        # Set value from expression
         value = self.visit(ctx.expr())
         
-        # Type checking
         if not self._check_type_compatibility(value, type_name):
             self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{id_name}' of type {type_name}")
-            # Set default value instead
+
             if type_name == 'int':
                 self.memory[id_name] = 0
             elif type_name == 'float':
@@ -123,29 +108,23 @@ class EvalVisitor(ExprVisitor):
             if type_name == 'FILE':
                 self.memory[id_name] = None
         else:
-            # Value is compatible, store it
             self.memory[id_name] = value
             
         return None
     
     def visitReadStatement(self, ctx):
-        # Process each variable in the read statement
         for id_node in ctx.ID():
             id_name = id_node.getText()
             
-            # Check if variable is declared
             if id_name not in self.declared:
                 self.type_errors.append(f"Variable '{id_name}' used before declaration")
                 continue
                 
-            # Get the type of the variable
             var_type = self.types[id_name]
             
-            # Read input from user
             try:
                 input_value = input(f"Enter value for {id_name} ({var_type}): ")
                 
-                # Convert input to appropriate type
                 if var_type == 'int':
                     value = int(input_value)
                 elif var_type == 'float':
@@ -164,7 +143,6 @@ class EvalVisitor(ExprVisitor):
                     self.type_errors.append(f"Unknown type for variable '{id_name}': {var_type}")
                     continue
                     
-                # Store the value
                 self.memory[id_name] = value
                     
             except ValueError:
@@ -173,53 +151,44 @@ class EvalVisitor(ExprVisitor):
         return None
         
     def visitWriteStatement(self, ctx):
-        # Evaluate and print each expression
         values = []
         for expr_ctx in ctx.expr():
             value = self.visit(expr_ctx)
             values.append(value)
             
-        # Print values separated by spaces, with newline at the end
         print(" ".join(str(val) for val in values))
         
         return None
         
     def visitBlockStatement(self, ctx):
-        # Execute each statement in the block
         for stmt_ctx in ctx.statement():
             self.visit(stmt_ctx)
             
         return None
         
     def visitIfStatement(self, ctx):
-        # Evaluate condition
         condition = self.visit(ctx.expr())
         
-        # Type checking for condition
         if not isinstance(condition, bool):
             self.type_errors.append(f"Type error: If condition must be boolean, got {type(condition).__name__}")
             return None
             
-        # Execute statement if condition is true
         if condition:
             self.visit(ctx.statement())
             
         return None
         
     def visitIfElseStatement(self, ctx):
-        # Evaluate condition
         condition = self.visit(ctx.expr())
         
-        # Type checking for condition
         if not isinstance(condition, bool):
             self.type_errors.append(f"Type error: If condition must be boolean, got {type(condition).__name__}")
             return None
             
-        # Execute appropriate branch based on condition
         if condition:
-            self.visit(ctx.statement(0))  # First statement (if branch)
+            self.visit(ctx.statement(0)) 
         else:
-            self.visit(ctx.statement(1))  # Second statement (else branch)
+            self.visit(ctx.statement(1)) 
             
         return None
         
@@ -228,22 +197,17 @@ class EvalVisitor(ExprVisitor):
         iteration_count = 0
         
         while iteration_count < max_iterations:
-            # Evaluate condition
             condition = self.visit(ctx.expr())
             
-            # Type checking for condition
             if not isinstance(condition, bool):
                 self.type_errors.append(f"Type error: While condition must be boolean, got {type(condition).__name__}")
                 return None
                 
-            # Exit loop if condition is false
             if not condition:
                 break
                 
-            # Execute statement body
             self.visit(ctx.statement())
 
-            # Increment counter to prevent infinite loops
             iteration_count += 1
         
         if iteration_count >= max_iterations:
@@ -269,26 +233,21 @@ class EvalVisitor(ExprVisitor):
     def visitExprStatement(self, ctx):
         return self.visit(ctx.expr())
         
-    # Arithmetic operations
     def visitMulDivMod(self, ctx):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
         op = ctx.getChild(1).getText()
         
-        # Type conversion for int to float if needed
         if isinstance(left, int) and isinstance(right, float):
             left = float(left)
         elif isinstance(left, float) and isinstance(right, int):
             right = float(right)
         
-        # Type checking
         if op == '%':
-            # Modulo only works on integers
             if not (isinstance(left, int) and isinstance(right, int)):
                 self.type_errors.append(f"Type error: '%' operator requires integer operands, got {type(left).__name__} and {type(right).__name__}")
                 return None
         else:
-            # Multiplication and division require numeric operands
             if not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
                 self.type_errors.append(f"Type error: '{op}' operator requires numeric operands, got {type(left).__name__} and {type(right).__name__}")
                 return None
@@ -300,7 +259,6 @@ class EvalVisitor(ExprVisitor):
                 self.type_errors.append("Runtime error: Division by zero")
                 return None
                 
-            # Division between integers produces int result (integer division)
             if isinstance(left, int) and isinstance(right, int):
                 return left // right
             else:
@@ -316,29 +274,24 @@ class EvalVisitor(ExprVisitor):
         right = self.visit(ctx.expr(1))
         op = ctx.getChild(1).getText()
         
-        # Type conversion for int to float if needed
         if op in ['+', '-'] and isinstance(left, int) and isinstance(right, float):
             left = float(left)
         elif op in ['+', '-'] and isinstance(left, float) and isinstance(right, int):
             right = float(right)
         
-        # Type checking based on operator
         if op == '.':
-            # String concatenation
             if not (isinstance(left, str) and isinstance(right, str)):
                 self.type_errors.append(f"Type error: '.' operator requires string operands, got {type(left).__name__} and {type(right).__name__}")
                 return None
             return left + right
         elif op == '+':
-            # Addition requires numeric operands or string concatenation
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
             elif not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
                 self.type_errors.append(f"Type error: '{op}' operator requires numeric operands, got {type(left).__name__} and {type(right).__name__}")
                 return None
             return left + right
-        else:  # op == '-'
-            # Subtraction requires numeric operands
+        else:  
             if not (isinstance(left, (int, float)) and isinstance(right, (int, float))):
                 self.type_errors.append(f"Type error: '{op}' operator requires numeric operands, got {type(left).__name__} and {type(right).__name__}")
                 return None
@@ -349,13 +302,11 @@ class EvalVisitor(ExprVisitor):
         right = self.visit(ctx.expr(1))
         op = ctx.getChild(1).getText()
         
-        # Type conversion for int to float if needed
         if isinstance(left, int) and isinstance(right, float):
             left = float(left)
         elif isinstance(left, float) and isinstance(right, int):
             right = float(right)
         
-        # Type checking for relational operators
         if not ((isinstance(left, int) and isinstance(right, int)) or 
                 (isinstance(left, float) and isinstance(right, float))):
             self.type_errors.append(f"Type error: '{op}' operator requires numeric operands of the same type, got {type(left).__name__} and {type(right).__name__}")
@@ -381,25 +332,21 @@ class EvalVisitor(ExprVisitor):
         
         if op == '==':
             return left == right
-        else:  # op == '!='
+        else: 
             return left != right
             
     def visitLogicalAnd(self, ctx):
         left = self.visit(ctx.expr(0))
         
-        # Type checking for left operand
         if not isinstance(left, bool):
             self.type_errors.append(f"Type error: '&&' operator requires boolean operands, got {type(left).__name__}")
             return None
             
-        # Short-circuit evaluation
         if not left:
             return False
             
-        # Evaluate right operand
         right = self.visit(ctx.expr(1))
         
-        # Type checking for right operand
         if not isinstance(right, bool):
             self.type_errors.append(f"Type error: '&&' operator requires boolean operands, got {type(right).__name__}")
             return None
@@ -409,19 +356,15 @@ class EvalVisitor(ExprVisitor):
     def visitLogicalOr(self, ctx):
         left = self.visit(ctx.expr(0))
         
-        # Type checking for left operand
         if not isinstance(left, bool):
             self.type_errors.append(f"Type error: '||' operator requires boolean operands, got {type(left).__name__}")
             return None
             
-        # Short-circuit evaluation
         if left:
             return True
             
-        # Evaluate right operand
         right = self.visit(ctx.expr(1))
         
-        # Type checking for right operand
         if not isinstance(right, bool):
             self.type_errors.append(f"Type error: '||' operator requires boolean operands, got {type(right).__name__}")
             return None
@@ -431,7 +374,6 @@ class EvalVisitor(ExprVisitor):
     def visitLogicalNot(self, ctx):
         value = self.visit(ctx.expr())
         
-        # Type checking - operand musí být typu bool
         if not isinstance(value, bool):
             try:
                 value = bool(value)
@@ -443,8 +385,7 @@ class EvalVisitor(ExprVisitor):
             
     def visitNotOp(self, ctx):
         operand = self.visit(ctx.expr())
-        
-        # Type checking
+
         if not isinstance(operand, bool):
             self.type_errors.append(f"Type error: '!' operator requires boolean operand, got {type(operand).__name__}")
             return None
@@ -462,18 +403,14 @@ class EvalVisitor(ExprVisitor):
         return text == 'true'
         
     def visitStringLiteral(self, ctx):
-        # Remove quotes and handle escape sequences
         text = ctx.STRING().getText()
-        # Remove the surrounding quotes
         text = text[1:-1]
-        # Handle escape sequences (basic implementation)
         text = text.replace('\\n', '\n').replace('\\t', '\t').replace('\\"', '"').replace('\\\\', '\\')
         return text
         
     def visitVariable(self, ctx):
         id_name = ctx.ID().getText()
         
-        # Check if variable is declared
         if id_name not in self.declared:
             self.type_errors.append(f"Variable '{id_name}' used before declaration")
             return None
@@ -503,12 +440,10 @@ class EvalVisitor(ExprVisitor):
     def visitId(self, ctx):
         id_name = ctx.getText()
         
-        # Check if variable is declared
         if id_name not in self.declared:
             self.type_errors.append(f"Variable '{id_name}' used before declaration")
             return None
             
-        # Return the variable value from memory
         return self.memory.get(id_name, self._get_default_value(self.types[id_name]))
 
     def visitVarDeclaration(self, ctx):
@@ -518,27 +453,21 @@ class EvalVisitor(ExprVisitor):
         var_type = ctx.type_().getText()
         var_name = ctx.ID().getText()
         
-        # Check if variable is already declared
         if var_name in self.declared:
-            # Skip re-declaration if this happens in a loop (just return current value)
             return self.memory.get(var_name)
         
-        # Declare the variable - mark as declared and set its type
         self.declared.add(var_name)
         self.types[var_name] = var_type
         
-        # Initialize with value if assignment is present
         if ctx.expr():
             value = self.visit(ctx.expr())
             
-            # Type checking for initial value
             if not self._check_type_compatibility(value, var_type):
                 self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{var_name}' of type {var_type}")
                 return None
                 
             self.memory[var_name] = value
         else:
-            # Initialize with default value if no assignment
             self.memory[var_name] = self._get_default_value(var_type)
         
         return self.memory[var_name]
@@ -560,7 +489,6 @@ class EvalVisitor(ExprVisitor):
     def visitUnaryMinus(self, ctx):
         value = self.visit(ctx.expr())
         
-        # Type checking
         if not isinstance(value, (int, float)):
             self.type_errors.append(f"Type error: Unary '-' operator requires numeric operand, got {type(value).__name__}")
             return None
@@ -571,10 +499,8 @@ class EvalVisitor(ExprVisitor):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
 
-        # Pokud right je proměnná typu FILE, použij její hodnotu (název souboru)
         if isinstance(right, str) and right in self.memory and self.types.get(right) == 'FILE':
             filename = self.memory[right]
-        # Pokud right je přímo název souboru (string končící na .txt)
         elif isinstance(right, str) and right.endswith('.txt'):
             filename = right
         else:
@@ -588,13 +514,11 @@ class EvalVisitor(ExprVisitor):
                 else:
                     f.write(str(left) + '\n')
             return filename
-        # Pokud right je string a není soubor, akumuluj hodnoty do seznamu
         elif isinstance(right, str):
             if isinstance(left, list):
                 return left + [right]
             else:
                 return [left, right]
-        # Pokud right je seznam, přidej left na začátek
         elif isinstance(right, list):
             return [left] + right
         else:

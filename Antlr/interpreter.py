@@ -10,7 +10,6 @@ class Interpreter:
         """Load a program from a file"""
         with open(filename, 'r', encoding='utf-8') as f:
             self.instructions = []
-            # First pass: collect all instructions and find labels
             line_num = 0
             for line in f:
                 line = line.strip()
@@ -46,7 +45,6 @@ class Interpreter:
             elif type_code == 'B':
                 self.stack.append(parts[2].lower() == 'true')
             elif type_code == 'S':
-                # Handle string literals with spaces and escape quotes
                 value = " ".join(parts[2:])
                 if value.startswith('"') and value.endswith('"'):
                     value = value[1:-1]
@@ -118,11 +116,11 @@ class Interpreter:
             label = int(parts[1])
             condition = self.stack.pop()
             if not condition:
-                self.pc = self.labels[label] - 1  # -1 because pc will be incremented
+                self.pc = self.labels[label] - 1  
                 
         elif opcode == 'jmp':
             label = int(parts[1])
-            self.pc = self.labels[label] - 1  # -1 because pc will be incremented
+            self.pc = self.labels[label] - 1
             
         elif opcode == 'read':
             type_code = parts[1]
@@ -139,7 +137,6 @@ class Interpreter:
             self.stack.append(value)
         
         elif opcode == 'itof':
-            # Convert integer to float
             value = self.stack.pop()
             if isinstance(value, int):
                 self.stack.append(float(value))
@@ -147,36 +144,30 @@ class Interpreter:
                 raise ValueError(f"Expected int for itof operation, got {type(value)}")
         
         elif opcode == 'not':
-            # Logical NOT
             value = self.stack.pop()
             self.stack.append(not value)
         
         elif opcode == 'and':
-            # Logical AND
             b = self.stack.pop()
             a = self.stack.pop()
             self.stack.append(a and b)
         
         elif opcode == 'or':
-            # Logical OR
             b = self.stack.pop()
             a = self.stack.pop()
             self.stack.append(a or b)
         
         elif opcode == 'mod':
-            # Modulo operation
             b = self.stack.pop()
             a = self.stack.pop()
             self.stack.append(a % b)
         
         elif opcode == 'concat':
-            # String concatenation
             b = self.stack.pop()
             a = self.stack.pop()
             self.stack.append(str(a) + str(b))
         
         elif opcode == 'uminus':
-            # Unary minus
             type_code = parts[1]
             value = self.stack.pop()
             self.stack.append(-value)

@@ -3,7 +3,7 @@ from ExprVisitor import ExprVisitor
 class CodeGenVisitor(ExprVisitor):
     def __init__(self):
         self.code = []
-        self.label_counter = -1  # Inicializovat na -1
+        self.label_counter = -1 
         self.var_types = {}
 
     def new_label(self):
@@ -17,14 +17,12 @@ class CodeGenVisitor(ExprVisitor):
 
     def visitExprStatement(self, ctx):
         self.visit(ctx.expr())
-        self.code.append("pop")  # zahodí výsledek výrazu
+        self.code.append("pop") 
 
     def visitDeclaration(self, ctx):
-        # Získej typ z kontextu - správně detekuje typ bez volání INT_TYPE() přímo
         type_ctx = ctx.type_()
         type_name = None
         
-        # Správná detekce typu
         if hasattr(type_ctx, 'INT_TYPE') and type_ctx.INT_TYPE():
             type_name = 'int'
         elif hasattr(type_ctx, 'FLOAT_TYPE') and type_ctx.FLOAT_TYPE():
@@ -36,7 +34,6 @@ class CodeGenVisitor(ExprVisitor):
         elif hasattr(type_ctx, 'FILE_TYPE') and type_ctx.FILE_TYPE():
             type_name = 'FILE'
         else:
-            # Bezpečnější způsob je podívat se na text typu
             type_text = type_ctx.getText().lower()
             if 'int' in type_text:
                 type_name = 'int'
@@ -49,13 +46,11 @@ class CodeGenVisitor(ExprVisitor):
             elif 'file' in type_text:
                 type_name = 'FILE'
         
-        # Přístup ke všem ID tokenům
         id_list = ctx.ID()
         for id_token in id_list:
             var_name = id_token.getText()
             self.var_types[var_name] = type_name
             
-            # Přidej výchozí hodnoty podle typu
             if type_name == 'int':
                 self.code.append("push I 0")
             elif type_name == 'float':
@@ -67,35 +62,28 @@ class CodeGenVisitor(ExprVisitor):
             elif type_name == 'FILE':
                 self.code.append("push S \"\"")
         
-            # Ulož výchozí hodnotu do proměnné
             self.code.append(f"save {var_name}")
 
     def visitDeclarationWithAssignment(self, ctx):
         var_name = ctx.ID().getText()
-        # Získej typ z kontextu
         type_name = self.visit(ctx.type_())
-        # Zaznamenej typ proměnné
         self.var_types[var_name] = type_name
-        # Vygeneruj kód pro výraz a uložení
         self.visit(ctx.expr())
         self.code.append(f"save {var_name}")
 
     def visitAssignment(self, ctx):
         var_name = ctx.ID().getText()
-        var_type = self.var_types.get(var_name)  # Zjisti typ proměnné
+        var_type = self.var_types.get(var_name) 
         
-        # Vyhodnoť výraz na pravé straně
         expr_ctx = ctx.expr()
         expr_type = self.getExprType(expr_ctx)
         self.visit(expr_ctx)
         
-        # Pokud je proměnná typu float a výraz je typu int, přidej konverzi
         if var_type == 'float' and expr_type == 'int':
             self.code.append("itof")
         
-        # Ulož hodnotu do proměnné
         self.code.append(f"save {var_name}")
-        self.code.append(f"load {var_name}")  # Přidej načtení hodnoty po přiřazení
+        self.code.append(f"load {var_name}")
 
     def visitIntLiteral(self, ctx):
         value = ctx.INT().getText()
@@ -169,7 +157,7 @@ class CodeGenVisitor(ExprVisitor):
             else:
                 self.code.append("div I")
         elif op == '%':
-            self.code.append("mod")  # mod je jen pro int
+            self.code.append("mod")
             
     def visitLogicalAnd(self, ctx):
         self.visit(ctx.expr(0))
@@ -209,40 +197,33 @@ class CodeGenVisitor(ExprVisitor):
                 self.code.append("gt F")
             else:
                 self.code.append("gt I")
-        # ... další operátory ...
 
     def visitEquality(self, ctx):
         left_ctx = ctx.expr(0)
         right_ctx = ctx.expr(1)
         
-        # Zjisti typy operandů
         left_type = self.getExprType(left_ctx)
         right_type = self.getExprType(right_ctx)
         
-        # Navštiv oba výrazy, aby se jejich hodnoty dostaly na zásobník
         self.visit(left_ctx)
         self.visit(right_ctx)
         
-        # Zvol správnou instrukci podle typu operandů
-        op = ctx.getChild(1).getText()  # == nebo !=
+        op = ctx.getChild(1).getText() 
         
-        # Zjisti, jaký typ rovnosti použít
-        eq_type = "I"  # výchozí typ je int
+        eq_type = "I"  
         if left_type == 'string' or right_type == 'string':
             eq_type = "S"
         elif left_type == 'float' or right_type == 'float':
             eq_type = "F"
         
-        # Generuj instrukci eq s odpovídajícím typem
         self.code.append(f"eq {eq_type}")
         
-        # Pro != potřebujeme negovat výsledek
         if op == '!=':
             self.code.append("not")
 
     def visitUnaryMinus(self, ctx):
         self.visit(ctx.expr())
-        self.code.append("uminus I")  # nebo "uminus F" podle typu
+        self.code.append("uminus I") 
 
     def visitItf(self, ctx):
         self.visit(ctx.expr())
@@ -255,7 +236,6 @@ class CodeGenVisitor(ExprVisitor):
         self.code.append(f"print {n}")
 
     def getExprType(self, ctx):
-        # Zjednodušeně: podle typu uzlu
         if hasattr(ctx, 'INT'):
             return 'int'
         if hasattr(ctx, 'FLOAT'):
@@ -264,86 +244,64 @@ class CodeGenVisitor(ExprVisitor):
             return 'string'
         if hasattr(ctx, 'BOOL'):
             return 'bool'
-        # Pokud je to proměnná, vrať typ proměnné (musíš mít slovník typů)
         if hasattr(ctx, 'ID'):
             var_name = ctx.ID().getText()
             return self.var_types.get(var_name, None)
-        # Doplň další podle potřeby
         return None
 
     def visitWhileStatement(self, ctx):
         start_label = self.new_label()
         end_label = self.new_label()
         
-        # Label na začátek cyklu
         self.code.append(f"label {start_label}")
         
-        # Podmínka cyklu
         self.visit(ctx.expr())
         
-        # Pokud je podmínka false, skoč na konec cyklu
         self.code.append(f"fjmp {end_label}")
         
-        # Tělo cyklu
         self.visit(ctx.statement())
         
-        # Skok zpět na začátek cyklu
         self.code.append(f"jmp {start_label}")
         
-        # Label pro konec cyklu
         self.code.append(f"label {end_label}")
 
     def visitIfStatement(self, ctx):
         end_label = self.new_label()
         
-        # Vyhodnoť podmínku
         self.visit(ctx.expr())
         
-        # Pokud je podmínka false, skoč na konec
         self.code.append(f"fjmp {end_label}")
         
-        # Tělo if
         self.visit(ctx.statement())
         
-        # Po dokončení if bloku skoč za konec
         next_label = self.new_label()
         self.code.append(f"jmp {next_label}")
         
-        # Label pro konec if (když je podmínka false)
         self.code.append(f"label {end_label}")
         
-        # Label pro následující kód
         self.code.append(f"label {next_label}")
 
     def visitIfElseStatement(self, ctx):
         else_label = self.new_label()
         end_label = self.new_label()
         
-        # Vyhodnoť podmínku
         self.visit(ctx.expr())
         
-        # Pokud je podmínka false, skoč na else větev
         self.code.append(f"fjmp {else_label}")
         
-        # Tělo if
         self.visit(ctx.statement(0))
         
-        # Po skončení if bloku skoč na konec celé konstrukce
         self.code.append(f"jmp {end_label}")
         
-        # Label pro else část
         self.code.append(f"label {else_label}")
         
-        # Else větev
         self.visit(ctx.statement(1))
         
-        # Label pro konec celé if/else konstrukce
         self.code.append(f"label {end_label}")
 
     def visitReadStatement(self, ctx):
         for id_ctx in ctx.ID():
             var_name = id_ctx.getText()
-            # Zjisti typ proměnné (musíš mít slovník typů, např. self.var_types)
             typ = self.var_types.get(var_name, None)
             if typ == 'int':
                 self.code.append("read I")
@@ -354,7 +312,7 @@ class CodeGenVisitor(ExprVisitor):
             elif typ == 'bool':
                 self.code.append("read B")
             else:
-                self.code.append("read I")  # fallback
+                self.code.append("read I")
             self.code.append(f"save {var_name}")
 
     def visitType(self, ctx):

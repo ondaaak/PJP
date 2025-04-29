@@ -31,7 +31,6 @@ write "true or false and true (true):", true || false && true;
     
     input_stream = InputStream(input_text)
     
-    # Setup lexer with error handling
     lexer = ExprLexer(input_stream)
     error_listener = SyntaxErrorListener()
     lexer.removeErrorListeners()
@@ -39,12 +38,10 @@ write "true or false and true (true):", true || false && true;
     
     tokens = CommonTokenStream(lexer)
     
-    # Setup parser with error handling
     parser = ExprParser(tokens)
     parser.removeErrorListeners()
     parser.addErrorListener(error_listener)
 
-    # Parse and check for syntax errors
     tree = parser.prog()
     
     if error_listener.syntax_errors:
@@ -53,18 +50,15 @@ write "true or false and true (true):", true || false && true;
             print(f"  {error}")
         return
     
-    # Use visitor for semantic analysis and evaluation
     visitor = EvalVisitor()
     results = visitor.visit(tree)
     
-    # Check for type errors
     if visitor.type_errors:
         print("Type errors detected:")
         for error in visitor.type_errors:
             print(f"  {error}")
         return
     
-    # If no errors, print results
     print("Results:")
     for r in results:
         if r is not None:
@@ -74,7 +68,6 @@ write "true or false and true (true):", true || false && true;
     for key, value in visitor.memory.items():
         print(f"{key}: {value} (type: {visitor.types.get(key, 'unknown')})")
     
-    # Generate code
     from CodeGenVisitor import CodeGenVisitor
     codegen = CodeGenVisitor()
     code = codegen.visit(tree)

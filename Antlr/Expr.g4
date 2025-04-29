@@ -29,7 +29,7 @@ expr: expr '&&' expr                         # LogicalAnd
     | expr '||' expr                         # LogicalOr
     | expr ('==' | '!=') expr                # Equality
     | expr ('<' | '>' | '<=' | '>=') expr    # Relational
-    | expr ('*' | '/' | '%') expr            # MulDivMod     // SWAP: Přehoďte toto pravidlo s pravidlem pro AddSubConcat
+    | expr ('*' | '/' | '%') expr            # MulDivMod   
     | expr SHR expr                          # ShiftRight
     | expr ('+' | '-' | '.') expr            # AddSubConcat
     | '!' expr                               # LogicalNot
@@ -71,10 +71,10 @@ GE: '>=';
 CONCAT: '.';
 
 BOOL: 'true' | 'false';
-ID: [a-zA-Z][a-zA-Z0-9]*;      // Identifiers start with letter, can contain digits
-INT: [0-9]+;                   // Integer literals
-FLOAT: [0-9]+ '.' [0-9]*;      // Float literals with decimal point
-STRING: '"' ( ~["\r\n\\] | '\\' . )* '"';  // String literals with optional escape sequences
+ID: [a-zA-Z][a-zA-Z0-9]*;     
+INT: [0-9]+;                   
+FLOAT: [0-9]+ '.' [0-9]*;      
+STRING: '"' ( ~["\r\n\\] | '\\' . )* '"';  
 
 // Handle whitespace and comments
 WS: [ \t\r\n]+ -> skip;        // Skip whitespace
