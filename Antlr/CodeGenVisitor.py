@@ -21,7 +21,20 @@ class CodeGenVisitor(ExprVisitor):
 
     def visitDeclaration(self, ctx):
         print("DEBUG: visitDeclaration called")
-        type_name = self.visit(ctx.type_())
+        
+        # Přímo zjisti typ z kontextu místo volání self.visit(ctx.type_())
+        type_name = None
+        if ctx.type_() and ctx.type_().INT_TYPE():
+            type_name = 'int'
+        elif ctx.type_() and ctx.type_().FLOAT_TYPE():
+            type_name = 'float'
+        elif ctx.type_() and ctx.type_().BOOL_TYPE():
+            type_name = 'bool'
+        elif ctx.type_() and ctx.type_().STRING_TYPE():
+            type_name = 'string'
+        elif ctx.type_() and ctx.type_().FILE_TYPE():
+            type_name = 'FILE'
+        
         print(f"DEBUG: type_name = {type_name}")
         
         # Přístup ke všem ID tokenům
