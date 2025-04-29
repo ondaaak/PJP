@@ -15,9 +15,11 @@ class SyntaxErrorListener(ErrorListener):
 
 def main():
     input_text = """
-write "<Relational operators>";
-write "1<5: ", 1 < 5;
-write "1>3.5: ", 1 > 3.5;
+
+int a,b;
+
+
+
 """
     
     input_stream = InputStream(input_text)

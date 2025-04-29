@@ -25,8 +25,8 @@ type: INT_TYPE      # IntType
     ;
 
 // Expression with operator precedence (from lowest to highest)
-expr: expr '||' expr                         # LogicalOr
-    | expr '&&' expr                         # LogicalAnd
+expr: expr '&&' expr                         # LogicalAnd
+    | expr '||' expr                         # LogicalOr
     | expr ('==' | '!=') expr                # Equality
     | expr ('<' | '>' | '<=' | '>=') expr    # Relational
     | expr ('*' | '/' | '%') expr            # MulDivMod     // SWAP: Přehoďte toto pravidlo s pravidlem pro AddSubConcat
