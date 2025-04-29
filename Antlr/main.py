@@ -27,8 +27,6 @@ write "false and true (false):", false && true;
 write "false or true (true):", false || true;
 write "not 1==2 (true):", !(1==2);
 write "true or false and true (true):", true || false && true;
-FILE f = "zprava.txt";
-"caukymnauky" >> "cusbus" >> f;
 """
     
     input_stream = InputStream(input_text)
@@ -75,6 +73,15 @@ FILE f = "zprava.txt";
     print("\nVariable values from visitor:")
     for key, value in visitor.memory.items():
         print(f"{key}: {value} (type: {visitor.types.get(key, 'unknown')})")
+    
+    # Generate code
+    from CodeGenVisitor import CodeGenVisitor
+    codegen = CodeGenVisitor()
+    code = codegen.visit(tree)
+    with open("output.asm", "w", encoding="utf-8") as f:
+        for line in code:
+            f.write(line + "\n")
+    print("Target code generated in output.asm")
 
 if __name__ == '__main__':
     main()
