@@ -25,26 +25,34 @@ class EvalVisitor(ExprVisitor):
         return None
         
     def visitAssignment(self, ctx):
-        id_name = ctx.ID().getText()
-        
-        if id_name not in self.declared:
-            self.type_errors.append(f"Variable '{id_name}' used before declaration")
-            return None
-            
+        var_name = ctx.ID().getText()
         value = self.visit(ctx.expr())
         
-        expected_type = self.types[id_name]
-        
-        if expected_type == 'float' and isinstance(value, int):
-            value = float(value)  
-        
-        if not self._check_type_compatibility(value, expected_type):
-            self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{id_name}' of type {expected_type}")
-            return None
+        if var_name in self.types:
+            var_type = self.types[var_name]
             
-        self.memory[id_name] = value
-        
-        return value 
+            if var_type == 'FILE' and isinstance(value, str):
+                self.memory[var_name] = value
+                return value
+            
+            if var_type == 'int' and isinstance(value, (int, float)):
+                self.memory[var_name] = int(value)
+                return int(value)
+            elif var_type == 'float' and isinstance(value, (int, float)):
+                self.memory[var_name] = float(value)
+                return float(value)
+            elif var_type == 'bool' and isinstance(value, bool):
+                self.memory[var_name] = value
+                return value
+            elif var_type == 'string' and isinstance(value, str):
+                self.memory[var_name] = value
+                return value
+            else:
+                self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{var_name}' of type {var_type}")
+                return None
+        else:
+            self.type_errors.append(f"Variable '{var_name}' not declared")
+            return None
         
     def visitDeclaration(self, ctx):
         type_name = self.visit(ctx.type_())
@@ -499,13 +507,11 @@ class EvalVisitor(ExprVisitor):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
 
-        # Pokud left je FILE proměnná
         if isinstance(left, str) and left in self.memory and self.types.get(left) == 'FILE':
             filename = self.memory[left]
             with open(filename, 'a', encoding='utf-8') as f:
                 f.write(str(right) + '\n')
             return filename
-        # Pokud left je literál souboru (string končící na .txt)
         elif isinstance(left, str) and left.endswith('.txt'):
             with open(left, 'a', encoding='utf-8') as f:
                 f.write(str(right) + '\n')

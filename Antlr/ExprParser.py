@@ -20,8 +20,8 @@ def serializedATN():
         3,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,
         4,1,4,3,4,117,8,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,
         4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,5,4,140,8,4,10,4,12,4,143,
-        9,4,1,4,0,1,8,5,0,2,4,6,8,0,4,1,0,27,28,1,0,29,32,1,0,8,10,2,0,11,
-        12,33,33,172,0,13,1,0,0,0,2,18,1,0,0,0,4,90,1,0,0,0,6,97,1,0,0,0,
+        9,4,1,4,0,1,8,5,0,2,4,6,8,0,4,1,0,27,28,1,0,29,32,1,0,8,10,2,0,12,
+        13,33,33,172,0,13,1,0,0,0,2,18,1,0,0,0,4,90,1,0,0,0,6,97,1,0,0,0,
         8,116,1,0,0,0,10,12,3,2,1,0,11,10,1,0,0,0,12,15,1,0,0,0,13,11,1,
         0,0,0,13,14,1,0,0,0,14,16,1,0,0,0,15,13,1,0,0,0,16,17,5,0,0,1,17,
         1,1,0,0,0,18,19,3,4,2,0,19,3,1,0,0,0,20,91,5,1,0,0,21,22,3,8,4,0,
@@ -29,24 +29,24 @@ def serializedATN():
         2,0,0,27,29,5,35,0,0,28,26,1,0,0,0,29,32,1,0,0,0,30,28,1,0,0,0,30,
         31,1,0,0,0,31,33,1,0,0,0,32,30,1,0,0,0,33,34,5,1,0,0,34,91,1,0,0,
         0,35,36,3,6,3,0,36,37,5,35,0,0,37,38,5,3,0,0,38,39,3,8,4,0,39,40,
-        5,1,0,0,40,91,1,0,0,0,41,42,5,16,0,0,42,47,5,35,0,0,43,44,5,2,0,
+        5,1,0,0,40,91,1,0,0,0,41,42,5,17,0,0,42,47,5,35,0,0,43,44,5,2,0,
         0,44,46,5,35,0,0,45,43,1,0,0,0,46,49,1,0,0,0,47,45,1,0,0,0,47,48,
-        1,0,0,0,48,50,1,0,0,0,49,47,1,0,0,0,50,91,5,1,0,0,51,52,5,17,0,0,
+        1,0,0,0,48,50,1,0,0,0,49,47,1,0,0,0,50,91,5,1,0,0,51,52,5,18,0,0,
         52,57,3,8,4,0,53,54,5,2,0,0,54,56,3,8,4,0,55,53,1,0,0,0,56,59,1,
         0,0,0,57,55,1,0,0,0,57,58,1,0,0,0,58,60,1,0,0,0,59,57,1,0,0,0,60,
         61,5,1,0,0,61,91,1,0,0,0,62,66,5,4,0,0,63,65,3,4,2,0,64,63,1,0,0,
         0,65,68,1,0,0,0,66,64,1,0,0,0,66,67,1,0,0,0,67,69,1,0,0,0,68,66,
-        1,0,0,0,69,91,5,5,0,0,70,71,5,13,0,0,71,72,5,6,0,0,72,73,3,8,4,0,
-        73,74,5,7,0,0,74,75,3,4,2,0,75,91,1,0,0,0,76,77,5,13,0,0,77,78,5,
-        6,0,0,78,79,3,8,4,0,79,80,5,7,0,0,80,81,3,4,2,0,81,82,5,14,0,0,82,
-        83,3,4,2,0,83,91,1,0,0,0,84,85,5,15,0,0,85,86,5,6,0,0,86,87,3,8,
+        1,0,0,0,69,91,5,5,0,0,70,71,5,14,0,0,71,72,5,6,0,0,72,73,3,8,4,0,
+        73,74,5,7,0,0,74,75,3,4,2,0,75,91,1,0,0,0,76,77,5,14,0,0,77,78,5,
+        6,0,0,78,79,3,8,4,0,79,80,5,7,0,0,80,81,3,4,2,0,81,82,5,15,0,0,82,
+        83,3,4,2,0,83,91,1,0,0,0,84,85,5,16,0,0,85,86,5,6,0,0,86,87,3,8,
         4,0,87,88,5,7,0,0,88,89,3,4,2,0,89,91,1,0,0,0,90,20,1,0,0,0,90,21,
         1,0,0,0,90,24,1,0,0,0,90,35,1,0,0,0,90,41,1,0,0,0,90,51,1,0,0,0,
         90,62,1,0,0,0,90,70,1,0,0,0,90,76,1,0,0,0,90,84,1,0,0,0,91,5,1,0,
-        0,0,92,98,5,18,0,0,93,98,5,19,0,0,94,98,5,20,0,0,95,98,5,21,0,0,
-        96,98,5,22,0,0,97,92,1,0,0,0,97,93,1,0,0,0,97,94,1,0,0,0,97,95,1,
+        0,0,92,98,5,19,0,0,93,98,5,20,0,0,94,98,5,21,0,0,95,98,5,22,0,0,
+        96,98,5,23,0,0,97,92,1,0,0,0,97,93,1,0,0,0,97,94,1,0,0,0,97,95,1,
         0,0,0,97,96,1,0,0,0,98,7,1,0,0,0,99,100,6,4,-1,0,100,101,5,26,0,
-        0,101,117,3,8,4,9,102,103,5,12,0,0,103,117,3,8,4,8,104,105,5,35,
+        0,101,117,3,8,4,9,102,103,5,13,0,0,103,117,3,8,4,8,104,105,5,35,
         0,0,105,106,5,3,0,0,106,117,3,8,4,7,107,117,5,36,0,0,108,117,5,37,
         0,0,109,117,5,34,0,0,110,117,5,38,0,0,111,117,5,35,0,0,112,113,5,
         6,0,0,113,114,3,8,4,0,114,115,5,7,0,0,115,117,1,0,0,0,116,99,1,0,
@@ -56,7 +56,7 @@ def serializedATN():
         8,4,17,121,122,10,15,0,0,122,123,5,25,0,0,123,140,3,8,4,16,124,125,
         10,14,0,0,125,126,7,0,0,0,126,140,3,8,4,15,127,128,10,13,0,0,128,
         129,7,1,0,0,129,140,3,8,4,14,130,131,10,12,0,0,131,132,7,2,0,0,132,
-        140,3,8,4,13,133,134,10,11,0,0,134,135,5,23,0,0,135,140,3,8,4,12,
+        140,3,8,4,13,133,134,10,11,0,0,134,135,5,11,0,0,135,140,3,8,4,12,
         136,137,10,10,0,0,137,138,7,3,0,0,138,140,3,8,4,11,139,118,1,0,0,
         0,139,121,1,0,0,0,139,124,1,0,0,0,139,127,1,0,0,0,139,130,1,0,0,
         0,139,133,1,0,0,0,139,136,1,0,0,0,140,143,1,0,0,0,141,139,1,0,0,
@@ -75,20 +75,20 @@ class ExprParser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "';'", "','", "'='", "'{'", "'}'", "'('", 
-                     "')'", "'*'", "'/'", "'%'", "'+'", "'-'", "'if'", "'else'", 
-                     "'while'", "'read'", "'write'", "'int'", "'float'", 
-                     "'bool'", "'string'", "'FILE'", "'<<'", "'&&'", "'||'", 
-                     "'!'", "'=='", "'!='", "'<'", "'>'", "'<='", "'>='", 
-                     "'.'" ]
+                     "')'", "'*'", "'/'", "'%'", "'<<'", "'+'", "'-'", "'if'", 
+                     "'else'", "'while'", "'read'", "'write'", "'int'", 
+                     "'float'", "'bool'", "'string'", "'FILE'", "'&&'", 
+                     "'||'", "'!'", "'=='", "'!='", "'<'", "'>'", "'<='", 
+                     "'>='", "'.'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "IF", "ELSE", "WHILE", "READ", "WRITE", 
-                      "INT_TYPE", "FLOAT_TYPE", "BOOL_TYPE", "STRING_TYPE", 
-                      "FILE_TYPE", "SHL", "AND", "OR", "NOT", "EQ", "NEQ", 
-                      "LT", "GT", "LE", "GE", "CONCAT", "BOOL", "ID", "INT", 
-                      "FLOAT", "STRING", "WS", "COMMENT" ]
+                      "<INVALID>", "<INVALID>", "IF", "ELSE", "WHILE", "READ", 
+                      "WRITE", "INT_TYPE", "FLOAT_TYPE", "BOOL_TYPE", "STRING_TYPE", 
+                      "FILE_TYPE", "AND", "OR", "NOT", "EQ", "NEQ", "LT", 
+                      "GT", "LE", "GE", "CONCAT", "BOOL", "ID", "INT", "FLOAT", 
+                      "STRING", "WS", "COMMENT" ]
 
     RULE_prog = 0
     RULE_command = 1
@@ -111,17 +111,17 @@ class ExprParser ( Parser ):
     T__9=10
     T__10=11
     T__11=12
-    IF=13
-    ELSE=14
-    WHILE=15
-    READ=16
-    WRITE=17
-    INT_TYPE=18
-    FLOAT_TYPE=19
-    BOOL_TYPE=20
-    STRING_TYPE=21
-    FILE_TYPE=22
-    SHL=23
+    T__12=13
+    IF=14
+    ELSE=15
+    WHILE=16
+    READ=17
+    WRITE=18
+    INT_TYPE=19
+    FLOAT_TYPE=20
+    BOOL_TYPE=21
+    STRING_TYPE=22
+    FILE_TYPE=23
     AND=24
     OR=25
     NOT=26
@@ -196,7 +196,7 @@ class ExprParser ( Parser ):
             self.state = 13
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 532651421778) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & 532659789906) != 0):
                 self.state = 10
                 self.command()
                 self.state = 15
@@ -686,7 +686,7 @@ class ExprParser ( Parser ):
                 self.state = 66
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 532651421778) != 0):
+                while (((_la) & ~0x3f) == 0 and ((1 << _la) & 532659789906) != 0):
                     self.state = 63
                     self.statement()
                     self.state = 68
@@ -902,31 +902,31 @@ class ExprParser ( Parser ):
             self.state = 97
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [18]:
+            if token in [19]:
                 localctx = ExprParser.IntTypeContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 92
                 self.match(ExprParser.INT_TYPE)
                 pass
-            elif token in [19]:
+            elif token in [20]:
                 localctx = ExprParser.FloatTypeContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
                 self.state = 93
                 self.match(ExprParser.FLOAT_TYPE)
                 pass
-            elif token in [20]:
+            elif token in [21]:
                 localctx = ExprParser.BoolTypeContext(self, localctx)
                 self.enterOuterAlt(localctx, 3)
                 self.state = 94
                 self.match(ExprParser.BOOL_TYPE)
                 pass
-            elif token in [21]:
+            elif token in [22]:
                 localctx = ExprParser.StringTypeContext(self, localctx)
                 self.enterOuterAlt(localctx, 4)
                 self.state = 95
                 self.match(ExprParser.STRING_TYPE)
                 pass
-            elif token in [22]:
+            elif token in [23]:
                 localctx = ExprParser.FileTypeContext(self, localctx)
                 self.enterOuterAlt(localctx, 5)
                 self.state = 96
@@ -996,8 +996,6 @@ class ExprParser ( Parser ):
             else:
                 return self.getTypedRuleContext(ExprParser.ExprContext,i)
 
-        def SHL(self):
-            return self.getToken(ExprParser.SHL, 0)
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterShiftLeft" ):
@@ -1430,7 +1428,7 @@ class ExprParser ( Parser ):
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 102
-                self.match(ExprParser.T__11)
+                self.match(ExprParser.T__12)
                 self.state = 103
                 self.expr(8)
                 pass
@@ -1600,7 +1598,7 @@ class ExprParser ( Parser ):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 11)")
                         self.state = 134
-                        self.match(ExprParser.SHL)
+                        self.match(ExprParser.T__10)
                         self.state = 135
                         self.expr(12)
                         pass
@@ -1614,7 +1612,7 @@ class ExprParser ( Parser ):
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 10)")
                         self.state = 137
                         _la = self._input.LA(1)
-                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 8589940736) != 0)):
+                        if not((((_la) & ~0x3f) == 0 and ((1 << _la) & 8589946880) != 0)):
                             self._errHandler.recoverInline(self)
                         else:
                             self._errHandler.reportMatch(self)
