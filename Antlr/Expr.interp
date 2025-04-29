@@ -22,7 +22,7 @@ null
 'bool'
 'string'
 'FILE'
-'>>'
+'<<'
 '&&'
 '||'
 '!'
@@ -65,7 +65,7 @@ FLOAT_TYPE
 BOOL_TYPE
 STRING_TYPE
 FILE_TYPE
-SHR
+SHL
 AND
 OR
 NOT

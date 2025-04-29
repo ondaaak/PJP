@@ -77,7 +77,7 @@ class ExprParser ( Parser ):
     literalNames = [ "<INVALID>", "';'", "','", "'='", "'{'", "'}'", "'('", 
                      "')'", "'*'", "'/'", "'%'", "'+'", "'-'", "'if'", "'else'", 
                      "'while'", "'read'", "'write'", "'int'", "'float'", 
-                     "'bool'", "'string'", "'FILE'", "'>>'", "'&&'", "'||'", 
+                     "'bool'", "'string'", "'FILE'", "'<<'", "'&&'", "'||'", 
                      "'!'", "'=='", "'!='", "'<'", "'>'", "'<='", "'>='", 
                      "'.'" ]
 
@@ -86,7 +86,7 @@ class ExprParser ( Parser ):
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "IF", "ELSE", "WHILE", "READ", "WRITE", 
                       "INT_TYPE", "FLOAT_TYPE", "BOOL_TYPE", "STRING_TYPE", 
-                      "FILE_TYPE", "SHR", "AND", "OR", "NOT", "EQ", "NEQ", 
+                      "FILE_TYPE", "SHL", "AND", "OR", "NOT", "EQ", "NEQ", 
                       "LT", "GT", "LE", "GE", "CONCAT", "BOOL", "ID", "INT", 
                       "FLOAT", "STRING", "WS", "COMMENT" ]
 
@@ -121,7 +121,7 @@ class ExprParser ( Parser ):
     BOOL_TYPE=20
     STRING_TYPE=21
     FILE_TYPE=22
-    SHR=23
+    SHL=23
     AND=24
     OR=25
     NOT=26
@@ -960,36 +960,6 @@ class ExprParser ( Parser ):
             super().copyFrom(ctx)
 
 
-    class ShiftRightContext(ExprContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a ExprParser.ExprContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def expr(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(ExprParser.ExprContext)
-            else:
-                return self.getTypedRuleContext(ExprParser.ExprContext,i)
-
-        def SHR(self):
-            return self.getToken(ExprParser.SHR, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterShiftRight" ):
-                listener.enterShiftRight(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitShiftRight" ):
-                listener.exitShiftRight(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitShiftRight" ):
-                return visitor.visitShiftRight(self)
-            else:
-                return visitor.visitChildren(self)
-
-
     class VariableContext(ExprContext):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a ExprParser.ExprContext
@@ -1010,6 +980,36 @@ class ExprParser ( Parser ):
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitVariable" ):
                 return visitor.visitVariable(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class ShiftLeftContext(ExprContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a ExprParser.ExprContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def expr(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(ExprParser.ExprContext)
+            else:
+                return self.getTypedRuleContext(ExprParser.ExprContext,i)
+
+        def SHL(self):
+            return self.getToken(ExprParser.SHL, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterShiftLeft" ):
+                listener.enterShiftLeft(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitShiftLeft" ):
+                listener.exitShiftLeft(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitShiftLeft" ):
+                return visitor.visitShiftLeft(self)
             else:
                 return visitor.visitChildren(self)
 
@@ -1593,14 +1593,14 @@ class ExprParser ( Parser ):
                         pass
 
                     elif la_ == 6:
-                        localctx = ExprParser.ShiftRightContext(self, ExprParser.ExprContext(self, _parentctx, _parentState))
+                        localctx = ExprParser.ShiftLeftContext(self, ExprParser.ExprContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expr)
                         self.state = 133
                         if not self.precpred(self._ctx, 11):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 11)")
                         self.state = 134
-                        self.match(ExprParser.SHR)
+                        self.match(ExprParser.SHL)
                         self.state = 135
                         self.expr(12)
                         pass

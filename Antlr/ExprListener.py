@@ -161,21 +161,21 @@ class ExprListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by ExprParser#ShiftRight.
-    def enterShiftRight(self, ctx:ExprParser.ShiftRightContext):
-        pass
-
-    # Exit a parse tree produced by ExprParser#ShiftRight.
-    def exitShiftRight(self, ctx:ExprParser.ShiftRightContext):
-        pass
-
-
     # Enter a parse tree produced by ExprParser#Variable.
     def enterVariable(self, ctx:ExprParser.VariableContext):
         pass
 
     # Exit a parse tree produced by ExprParser#Variable.
     def exitVariable(self, ctx:ExprParser.VariableContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#ShiftLeft.
+    def enterShiftLeft(self, ctx:ExprParser.ShiftLeftContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#ShiftLeft.
+    def exitShiftLeft(self, ctx:ExprParser.ShiftLeftContext):
         pass
 
 

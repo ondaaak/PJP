@@ -94,13 +94,13 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ExprParser#ShiftRight.
-    def visitShiftRight(self, ctx:ExprParser.ShiftRightContext):
+    # Visit a parse tree produced by ExprParser#Variable.
+    def visitVariable(self, ctx:ExprParser.VariableContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by ExprParser#Variable.
-    def visitVariable(self, ctx:ExprParser.VariableContext):
+    # Visit a parse tree produced by ExprParser#ShiftLeft.
+    def visitShiftLeft(self, ctx:ExprParser.ShiftLeftContext):
         return self.visitChildren(ctx)
 
 

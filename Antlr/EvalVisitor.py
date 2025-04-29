@@ -495,32 +495,21 @@ class EvalVisitor(ExprVisitor):
             
         return -value
 
-    def visitShiftRight(self, ctx):
+    def visitShiftLeft(self, ctx):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
 
-        if isinstance(right, str) and right in self.memory and self.types.get(right) == 'FILE':
-            filename = self.memory[right]
-        elif isinstance(right, str) and right.endswith('.txt'):
-            filename = right
-        else:
-            filename = None
-
-        if filename:
+        # Pokud left je FILE proměnná
+        if isinstance(left, str) and left in self.memory and self.types.get(left) == 'FILE':
+            filename = self.memory[left]
             with open(filename, 'a', encoding='utf-8') as f:
-                if isinstance(left, list):
-                    for item in left:
-                        f.write(str(item) + '\n')
-                else:
-                    f.write(str(left) + '\n')
+                f.write(str(right) + '\n')
             return filename
-        elif isinstance(right, str):
-            if isinstance(left, list):
-                return left + [right]
-            else:
-                return [left, right]
-        elif isinstance(right, list):
-            return [left] + right
+        # Pokud left je literál souboru (string končící na .txt)
+        elif isinstance(left, str) and left.endswith('.txt'):
+            with open(left, 'a', encoding='utf-8') as f:
+                f.write(str(right) + '\n')
+            return left
         else:
-            self.type_errors.append("Operator '>>' vyžaduje jako pravý operand soubor (FILE) nebo název souboru (string končící na .txt)")
+            self.type_errors.append("Operator '<<' vyžaduje jako levý operand soubor (FILE) nebo název souboru (string končící na .txt)")
             return None

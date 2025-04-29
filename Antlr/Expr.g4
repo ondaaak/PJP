@@ -30,7 +30,7 @@ expr: expr '&&' expr                         # LogicalAnd
     | expr ('==' | '!=') expr                # Equality
     | expr ('<' | '>' | '<=' | '>=') expr    # Relational
     | expr ('*' | '/' | '%') expr            # MulDivMod   
-    | expr SHR expr                          # ShiftRight
+    | expr SHL expr                          # ShiftLeft 
     | expr ('+' | '-' | '.') expr            # AddSubConcat
     | '!' expr                               # LogicalNot
     | '-' expr                               # UnaryMinus
@@ -55,8 +55,7 @@ FLOAT_TYPE: 'float';
 BOOL_TYPE: 'bool';
 STRING_TYPE: 'string';
 FILE_TYPE: 'FILE';
-SHR: '>>';
-
+SHL: '<<'; 
 
 // Operators
 AND: '&&';
