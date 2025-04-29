@@ -152,6 +152,24 @@ class ExprListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ExprParser#FileType.
+    def enterFileType(self, ctx:ExprParser.FileTypeContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#FileType.
+    def exitFileType(self, ctx:ExprParser.FileTypeContext):
+        pass
+
+
+    # Enter a parse tree produced by ExprParser#ShiftRight.
+    def enterShiftRight(self, ctx:ExprParser.ShiftRightContext):
+        pass
+
+    # Exit a parse tree produced by ExprParser#ShiftRight.
+    def exitShiftRight(self, ctx:ExprParser.ShiftRightContext):
+        pass
+
+
     # Enter a parse tree produced by ExprParser#Variable.
     def enterVariable(self, ctx:ExprParser.VariableContext):
         pass

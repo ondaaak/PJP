@@ -27,6 +27,7 @@ write "false and true (false):", false && true;
 write "false or true (true):", false || true;
 write "not 1==2 (true):", !(1==2);
 write "true or false and true (true):", true || false && true;
+"a" >> "b" >> "c" >> "zprava.txt";
 """
     
     input_stream = InputStream(input_text)

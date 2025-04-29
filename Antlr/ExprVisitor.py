@@ -89,6 +89,16 @@ class ExprVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ExprParser#FileType.
+    def visitFileType(self, ctx:ExprParser.FileTypeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ExprParser#ShiftRight.
+    def visitShiftRight(self, ctx:ExprParser.ShiftRightContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ExprParser#Variable.
     def visitVariable(self, ctx:ExprParser.VariableContext):
         return self.visitChildren(ctx)

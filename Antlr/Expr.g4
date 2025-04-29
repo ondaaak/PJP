@@ -21,6 +21,7 @@ type: INT_TYPE      # IntType
     | FLOAT_TYPE    # FloatType
     | BOOL_TYPE     # BoolType
     | STRING_TYPE   # StringType
+    | FILE_TYPE     # FileType
     ;
 
 // Expression with operator precedence (from lowest to highest)
@@ -29,6 +30,7 @@ expr: expr '||' expr                         # LogicalOr
     | expr ('==' | '!=') expr                # Equality
     | expr ('<' | '>' | '<=' | '>=') expr    # Relational
     | expr ('*' | '/' | '%') expr            # MulDivMod     // SWAP: Přehoďte toto pravidlo s pravidlem pro AddSubConcat
+    | expr SHR expr                          # ShiftRight
     | expr ('+' | '-' | '.') expr            # AddSubConcat
     | '!' expr                               # LogicalNot
     | '-' expr                               # UnaryMinus
@@ -52,6 +54,9 @@ INT_TYPE: 'int';
 FLOAT_TYPE: 'float';
 BOOL_TYPE: 'bool';
 STRING_TYPE: 'string';
+FILE_TYPE: 'FILE';
+SHR: '>>';
+
 
 // Operators
 AND: '&&';

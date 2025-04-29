@@ -549,3 +549,30 @@ class EvalVisitor(ExprVisitor):
             return None
             
         return -value
+
+    def visitShiftRight(self, ctx):
+        left = self.visit(ctx.expr(0))
+        right = self.visit(ctx.expr(1))
+        # Pokud right je string končící na .txt, zapiš left (nebo seznam) do souboru
+        if isinstance(right, str) and right.endswith('.txt'):
+            # Pokud left je seznam, zapiš všechny položky
+            if isinstance(left, list):
+                with open(right, 'a', encoding='utf-8') as f:
+                    for item in left:
+                        f.write(str(item) + '\n')
+            else:
+                with open(right, 'a', encoding='utf-8') as f:
+                    f.write(str(left) + '\n')
+            return right
+        # Pokud right je string a není soubor, akumuluj hodnoty do seznamu
+        elif isinstance(right, str):
+            if isinstance(left, list):
+                return left + [right]
+            else:
+                return [left, right]
+        # Pokud right je seznam, přidej left na začátek
+        elif isinstance(right, list):
+            return [left] + right
+        else:
+            self.type_errors.append("Operator '>>' vyžaduje jako pravý operand název souboru (string končící na .txt)")
+            return None
