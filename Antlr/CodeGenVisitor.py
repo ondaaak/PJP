@@ -20,33 +20,43 @@ class CodeGenVisitor(ExprVisitor):
         self.code.append("pop")  # zahodí výsledek výrazu
 
     def visitDeclaration(self, ctx):
-        print("DEBUG: visitDeclaration called")
-        
-        # Přímo zjisti typ z kontextu místo volání self.visit(ctx.type_())
+        # Získej typ z kontextu - správně detekuje typ bez volání INT_TYPE() přímo
+        type_ctx = ctx.type_()
         type_name = None
-        if ctx.type_() and ctx.type_().INT_TYPE():
-            type_name = 'int'
-        elif ctx.type_() and ctx.type_().FLOAT_TYPE():
-            type_name = 'float'
-        elif ctx.type_() and ctx.type_().BOOL_TYPE():
-            type_name = 'bool'
-        elif ctx.type_() and ctx.type_().STRING_TYPE():
-            type_name = 'string'
-        elif ctx.type_() and ctx.type_().FILE_TYPE():
-            type_name = 'FILE'
         
-        print(f"DEBUG: type_name = {type_name}")
+        # Správná detekce typu
+        if hasattr(type_ctx, 'INT_TYPE') and type_ctx.INT_TYPE():
+            type_name = 'int'
+        elif hasattr(type_ctx, 'FLOAT_TYPE') and type_ctx.FLOAT_TYPE():
+            type_name = 'float'
+        elif hasattr(type_ctx, 'BOOL_TYPE') and type_ctx.BOOL_TYPE():
+            type_name = 'bool'
+        elif hasattr(type_ctx, 'STRING_TYPE') and type_ctx.STRING_TYPE():
+            type_name = 'string'
+        elif hasattr(type_ctx, 'FILE_TYPE') and type_ctx.FILE_TYPE():
+            type_name = 'FILE'
+        else:
+            # Bezpečnější způsob je podívat se na text typu
+            type_text = type_ctx.getText().lower()
+            if 'int' in type_text:
+                type_name = 'int'
+            elif 'float' in type_text:
+                type_name = 'float'
+            elif 'bool' in type_text:
+                type_name = 'bool'
+            elif 'string' in type_text:
+                type_name = 'string'
+            elif 'file' in type_text:
+                type_name = 'FILE'
         
         # Přístup ke všem ID tokenům
         id_list = ctx.ID()
         for id_token in id_list:
             var_name = id_token.getText()
-            print(f"DEBUG: var_name = {var_name}")
             self.var_types[var_name] = type_name
             
             # Přidej výchozí hodnoty podle typu
             if type_name == 'int':
-                print("DEBUG: Adding push I 0")
                 self.code.append("push I 0")
             elif type_name == 'float':
                 self.code.append("push F 0.0")
@@ -72,7 +82,18 @@ class CodeGenVisitor(ExprVisitor):
 
     def visitAssignment(self, ctx):
         var_name = ctx.ID().getText()
-        self.visit(ctx.expr())
+        var_type = self.var_types.get(var_name)  # Zjisti typ proměnné
+        
+        # Vyhodnoť výraz na pravé straně
+        expr_ctx = ctx.expr()
+        expr_type = self.getExprType(expr_ctx)
+        self.visit(expr_ctx)
+        
+        # Pokud je proměnná typu float a výraz je typu int, přidej konverzi
+        if var_type == 'float' and expr_type == 'int':
+            self.code.append("itof")
+        
+        # Ulož hodnotu do proměnné
         self.code.append(f"save {var_name}")
         self.code.append(f"load {var_name}")  # Přidej načtení hodnoty po přiřazení
 
@@ -94,30 +115,61 @@ class CodeGenVisitor(ExprVisitor):
 
     def visitVariable(self, ctx):
         var_name = ctx.ID().getText()
-        self.code.append(f"load {var_name}")
+        self.code.append(f"load {var_name} ")
 
     def visitAddSubConcat(self, ctx):
-        self.visit(ctx.expr(0))
-        self.visit(ctx.expr(1))
+        left_ctx = ctx.expr(0)
+        right_ctx = ctx.expr(1)
+        left_type = self.getExprType(left_ctx)
+        right_type = self.getExprType(right_ctx)
+        
+        self.visit(left_ctx)
+        if left_type == 'int' and right_type == 'float':
+            self.code.append("itof")
+        self.visit(right_ctx)
+        if right_type == 'int' and left_type == 'float':
+            self.code.append("itof")
+        
         op = ctx.getChild(1).getText()
         if op == '+':
-            # Zjisti typ (I nebo F) podle typu operandů, zde zjednodušeně I
-            self.code.append("add I")
+            if left_type == 'float' or right_type == 'float':
+                self.code.append("add F")
+            else:
+                self.code.append("add I")
         elif op == '-':
-            self.code.append("sub I")
+            if left_type == 'float' or right_type == 'float':
+                self.code.append("sub F")
+            else:
+                self.code.append("sub I")
         elif op == '.':
             self.code.append("concat")
-    
+
     def visitMulDivMod(self, ctx):
-        self.visit(ctx.expr(0))
-        self.visit(ctx.expr(1))
+        left_ctx = ctx.expr(0)
+        right_ctx = ctx.expr(1)
+        left_type = self.getExprType(left_ctx)
+        right_type = self.getExprType(right_ctx)
+        
+        self.visit(left_ctx)
+        if left_type == 'int' and right_type == 'float':
+            self.code.append("itof")
+        self.visit(right_ctx)
+        if right_type == 'int' and left_type == 'float':
+            self.code.append("itof")
+        
         op = ctx.getChild(1).getText()
         if op == '*':
-            self.code.append("mul I")  # nebo "mul F" podle typu
+            if left_type == 'float' or right_type == 'float':
+                self.code.append("mul F")
+            else:
+                self.code.append("mul I")
         elif op == '/':
-            self.code.append("div I")  # nebo "div F" podle typu
+            if left_type == 'float' or right_type == 'float':
+                self.code.append("div F")
+            else:
+                self.code.append("div I")
         elif op == '%':
-            self.code.append("mod")
+            self.code.append("mod")  # mod je jen pro int
             
     def visitLogicalAnd(self, ctx):
         self.visit(ctx.expr(0))
