@@ -10,6 +10,7 @@ class EvalVisitor(ExprVisitor):
         self.type_errors = []
         
     def visitProg(self, ctx):
+        print("visitProg called")
         results = []
         for cmd in ctx.command():
             result = self.visit(cmd)
@@ -237,13 +238,13 @@ class EvalVisitor(ExprVisitor):
         
     def visitIntType(self, ctx):
         return 'int'
-        
+
     def visitFloatType(self, ctx):
         return 'float'
-        
+
     def visitBoolType(self, ctx):
         return 'bool'
-        
+
     def visitStringType(self, ctx):
         return 'string'
         
@@ -493,21 +494,6 @@ class EvalVisitor(ExprVisitor):
         # Return the variable value from memory
         return self.memory.get(id_name, self._get_default_value(self.types[id_name]))
 
-    def visitProgram(self, ctx):
-        """
-        Hlavní metoda pro návštěvu programu - zpracovává jednotlivé příkazy sekvenčně
-        """
-        results = []
-        
-        # Process each statement in the program
-        for statement in ctx.statement():
-            result = self.visit(statement)
-            # Store non-None results
-            if result is not None:
-                results.append(result)
-                
-        return results
-
     def visitVarDeclaration(self, ctx):
         """
         Zpracovává deklaraci proměnné, ukládá typ a inicializuje hodnotu
@@ -562,4 +548,4 @@ class EvalVisitor(ExprVisitor):
             self.type_errors.append(f"Type error: Unary '-' operator requires numeric operand, got {type(value).__name__}")
             return None
             
-        return -value 
+        return -value

@@ -17,10 +17,10 @@ statement: ';'                                # EmptyStatement
          | 'while' '(' expr ')' statement     # WhileStatement
          ;
 
-type: 'int'                                  # IntType
-    | 'float'                                # FloatType
-    | 'bool'                                 # BoolType
-    | 'string'                               # StringType
+type: INT_TYPE      # IntType
+    | FLOAT_TYPE    # FloatType
+    | BOOL_TYPE     # BoolType
+    | STRING_TYPE   # StringType
     ;
 
 // Expression with operator precedence (from lowest to highest)
