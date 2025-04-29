@@ -76,12 +76,25 @@ class EvalVisitor(ExprVisitor):
                 self.memory[id_name] = False
             elif type_name == 'string':
                 self.memory[id_name] = ""
+            if type_name == 'FILE':
+                self.memory[id_name] = None  # nebo otevřený soubor, pokud budeš implementovat práci se soubory
                 
         return None
         
     def visitDeclarationWithAssignment(self, ctx):
-        id_name = ctx.ID().getText()
         type_name = self.visit(ctx.type_())
+        id_name = ctx.ID().getText()
+        value = self.visit(ctx.expr())
+        # Povolit přiřazení stringu do FILE
+        if type_name == 'FILE':
+            if not isinstance(value, str):
+                self.type_errors.append(f"Type error: Cannot assign {type(value).__name__} to variable '{id_name}' of type FILE")
+                return None
+            self.memory[id_name] = value
+            self.types[id_name] = 'FILE'
+            self.declared.add(id_name)
+            return value
+        # ...ostatní typy...
         
         # Check for redeclaration
         if id_name in self.declared:
@@ -107,6 +120,8 @@ class EvalVisitor(ExprVisitor):
                 self.memory[id_name] = False
             elif type_name == 'string':
                 self.memory[id_name] = ""
+            if type_name == 'FILE':
+                self.memory[id_name] = None
         else:
             # Value is compatible, store it
             self.memory[id_name] = value
@@ -247,6 +262,9 @@ class EvalVisitor(ExprVisitor):
 
     def visitStringType(self, ctx):
         return 'string'
+
+    def visitFileType(self, ctx):
+        return 'FILE'
         
     def visitExprStatement(self, ctx):
         return self.visit(ctx.expr())
@@ -428,8 +446,7 @@ class EvalVisitor(ExprVisitor):
         
         # Type checking
         if not isinstance(operand, bool):
-            error_msg = f"Type error: '!' operator requires boolean operand, got {type(operand).__name__}"
-            self.type_errors.append(error_msg)
+            self.type_errors.append(f"Type error: '!' operator requires boolean operand, got {type(operand).__name__}")
             return None
             
         return not operand
@@ -553,17 +570,24 @@ class EvalVisitor(ExprVisitor):
     def visitShiftRight(self, ctx):
         left = self.visit(ctx.expr(0))
         right = self.visit(ctx.expr(1))
-        # Pokud right je string končící na .txt, zapiš left (nebo seznam) do souboru
-        if isinstance(right, str) and right.endswith('.txt'):
-            # Pokud left je seznam, zapiš všechny položky
-            if isinstance(left, list):
-                with open(right, 'a', encoding='utf-8') as f:
+
+        # Pokud right je proměnná typu FILE, použij její hodnotu (název souboru)
+        if isinstance(right, str) and right in self.memory and self.types.get(right) == 'FILE':
+            filename = self.memory[right]
+        # Pokud right je přímo název souboru (string končící na .txt)
+        elif isinstance(right, str) and right.endswith('.txt'):
+            filename = right
+        else:
+            filename = None
+
+        if filename:
+            with open(filename, 'a', encoding='utf-8') as f:
+                if isinstance(left, list):
                     for item in left:
                         f.write(str(item) + '\n')
-            else:
-                with open(right, 'a', encoding='utf-8') as f:
+                else:
                     f.write(str(left) + '\n')
-            return right
+            return filename
         # Pokud right je string a není soubor, akumuluj hodnoty do seznamu
         elif isinstance(right, str):
             if isinstance(left, list):
@@ -574,5 +598,5 @@ class EvalVisitor(ExprVisitor):
         elif isinstance(right, list):
             return [left] + right
         else:
-            self.type_errors.append("Operator '>>' vyžaduje jako pravý operand název souboru (string končící na .txt)")
+            self.type_errors.append("Operator '>>' vyžaduje jako pravý operand soubor (FILE) nebo název souboru (string končící na .txt)")
             return None
